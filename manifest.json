@@ -1,6 +1,6 @@
 {
 	"id": "export-browser-tabs",
-	"name": "Export browser tabs",
+	"name": "Export Browser Tabs",
 	"version": "0.1.0",
 	"minAppVersion": "1.4.0",
 	"description": "Export your open browser tabs using Applescript",
