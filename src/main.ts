@@ -98,7 +98,7 @@ export default class ExportBrowserTabs extends Plugin {
 		try {
 			await this.app.vault.createFolder(folderPath);
 		} catch (err) {
-			if (err.message === "Folder already exists") {
+			if (err.message.includes("already exists")) {
 				return;
 			}
 			throw err;
