@@ -15,16 +15,20 @@ This is a basic Obsidian plugin that allows MacOS users to export their open bro
 
 ## Settings
 
--   Browser name
--   Save path
--   Note title
+-   Browser name - The browser that you wish to pull tabs from
+-   Save path - The relative path of the folder to save to in Obsidian.md
+-   Note title - The name of the note that will be created
 
 ## Usage
 
-**NOTE**
-Please note that this plugin executes AppleScript. It only works on a MacOS system.
+**PLEASE NOTE**
 
-Open the Obsidian command prompt (cmd + shift + p) and type `Export tabs from browser`
+This plugin executes AppleScript. It will only work on a MacOS system.
+
+1. Open the Obsidian command prompt (cmd + shift + p)
+2. Type `Export tabs from browser`
+3. Press enter
+4. See your tab links in your note
 
 ## Development
 
@@ -39,4 +43,4 @@ Open the Obsidian command prompt (cmd + shift + p) and type `Export tabs from br
 
 ## License
 
-MIT
+This plugin is distributed under the [MIT License](https://github.com/trey-wallis/obsidian-export-browser-tabs/blob/master/LICENSE)
