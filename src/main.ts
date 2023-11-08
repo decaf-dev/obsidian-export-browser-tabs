@@ -14,7 +14,7 @@ interface ExportBrowserTabsSettings {
 const DEFAULT_SETTINGS: ExportBrowserTabsSettings = {
 	internalSavePath: "",
 	browserApplicationName: "",
-	fileName: "",
+	fileName: "Browser tabs",
 };
 
 export default class ExportBrowserTabs extends Plugin {
