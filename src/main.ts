@@ -61,6 +61,12 @@ export default class ExportBrowserTabs extends Plugin {
 	}
 
 	private async exportBrowserTabs(browserApplicationName: string) {
+		if (browserApplicationName === "") {
+			throw new Error(
+				"No browser application name specified. Please set one in the plugin settings."
+			);
+		}
+
 		const appleScript = `
 		tell application "${browserApplicationName}"
 			set tabList to {}
