@@ -36,10 +36,13 @@ export default class ExportBrowserTabs extends Plugin {
 					const tabs = await this.exportBrowserTabs(
 						this.settings.browserApplicationName
 					);
+					const markdownLinks = tabs.map(
+						(tab) => `[${tab.title}](${tab.url})`
+					);
 					await this.createFile(
 						this.settings.vaultSavePath,
 						this.settings.fileName,
-						tabs.join("\n")
+						markdownLinks.join("\n\n")
 					);
 					new Notice(
 						`Exported ${tabs.length} browser tabs from ${this.settings.browserApplicationName}`
@@ -74,24 +77,33 @@ export default class ExportBrowserTabs extends Plugin {
 		}
 
 		const appleScript = `
-		tell application "${browserApplicationName}"
-			set tabList to {}
-			repeat with theWindow in (every window)
-				repeat with theTab in (every tab of theWindow)
-					set the end of tabList to the URL of theTab
+			tell application "${browserApplicationName}"
+				set tabInfoList to ""
+				repeat with theWindow in (every window)
+					repeat with theTab in (every tab of theWindow)
+						set tabInfoList to tabInfoList & the URL of theTab & "|" & the title of theTab & "\n"
+					end repeat
 				end repeat
-			end repeat
-			return tabList
-		end tell
+				return tabInfoList
+			end tell
 		`;
 
 		const { stdout, stderr } = await exec(`osascript -e '${appleScript}'`);
 		if (stderr) {
 			throw new Error(stderr);
 		}
-		const result = stdout.split(", ");
-		console.log("Result", result);
-		return result;
+		const tabs = stdout
+			.trim()
+			.split("\n")
+			.map((entry) => {
+				// Split the entry by the first occurrence of "|"
+				const [url, ...titleParts] = entry.split("|");
+				const title = titleParts.join("|"); // Rejoin the title in case it contains "|"
+				return { url, title };
+			});
+
+		//console.log("Tabs", tabs);
+		return tabs;
 	}
 
 	private async createFolder(folderPath: string) {
