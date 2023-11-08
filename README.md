@@ -26,7 +26,7 @@ This is a basic Obsidian plugin that allows MacOS users to export their open bro
 This plugin executes AppleScript. It will only work on a MacOS system.
 
 1. Open the Obsidian command prompt (cmd + shift + p)
-2. Type `Export tabs from browser`
+2. Type `Export tabs`
 3. Press enter
 
 ## Development
