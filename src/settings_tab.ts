@@ -33,7 +33,7 @@ export default class SettingsTab extends PluginSettingTab {
 			.setDesc(
 				"The internal Obsidian path to save the exported tabs file to."
 			)
-			.addSearch((text) =>
+			.addText((text) =>
 				text
 					.setValue(this.plugin.settings.internalSavePath)
 					.onChange(async (value) => {
@@ -43,15 +43,15 @@ export default class SettingsTab extends PluginSettingTab {
 			);
 
 		new Setting(containerEl)
-			.setName("File name format")
+			.setName("File name")
 			.setDesc(
-				"The file name format to use when saving the exported tabs."
+				"The file name to use when saving the exported tabs. A timestamp will be appended to the end."
 			)
-			.addSearch((text) =>
+			.addText((text) =>
 				text
-					.setValue(this.plugin.settings.fileNameFormat)
+					.setValue(this.plugin.settings.fileName)
 					.onChange(async (value) => {
-						this.plugin.settings.fileNameFormat = value;
+						this.plugin.settings.fileName = value;
 						await this.plugin.saveSettings();
 					})
 			);
