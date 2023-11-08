@@ -1,4 +1,4 @@
-import { Notice, Plugin } from "obsidian";
+import { Notice, Plugin, normalizePath } from "obsidian";
 import { exec as execCallback } from "child_process";
 import { promisify } from "util";
 import SettingsTab from "./settings_tab";
@@ -37,6 +37,7 @@ export default class ExportBrowserTabs extends Plugin {
 						this.settings.browserApplicationName
 					);
 					await this.createFile(
+						this.settings.internalSavePath,
 						this.settings.fileName,
 						tabs.join("\n")
 					);
@@ -104,8 +105,13 @@ export default class ExportBrowserTabs extends Plugin {
 		}
 	}
 
-	private async createFile(fileName: string, data: string) {
-		const filePath = fileName + Date.now() + ".md";
-		await this.app.vault.create(filePath, data);
+	private async createFile(
+		vaultSavePath: string,
+		fileName: string,
+		data: string
+	) {
+		const newFilePath = `${vaultSavePath}/${fileName} ${Date.now()}.md`;
+		const normalizedFilePath = normalizePath(newFilePath);
+		await this.app.vault.create(normalizedFilePath, data);
 	}
 }
