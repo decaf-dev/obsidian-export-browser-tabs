@@ -6,13 +6,13 @@ import SettingsTab from "./settings_tab";
 const exec = promisify(execCallback);
 
 interface ExportBrowserTabsSettings {
-	internalSavePath: string;
+	vaultSavePath: string;
 	browserApplicationName: string;
 	fileName: string;
 }
 
 const DEFAULT_SETTINGS: ExportBrowserTabsSettings = {
-	internalSavePath: "",
+	vaultSavePath: "",
 	browserApplicationName: "",
 	fileName: "Browser tabs",
 };
@@ -32,12 +32,12 @@ export default class ExportBrowserTabs extends Plugin {
 			name: "Export tabs",
 			callback: async () => {
 				try {
-					await this.createFolder(this.settings.internalSavePath);
+					await this.createFolder(this.settings.vaultSavePath);
 					const tabs = await this.exportBrowserTabs(
 						this.settings.browserApplicationName
 					);
 					await this.createFile(
-						this.settings.internalSavePath,
+						this.settings.vaultSavePath,
 						this.settings.fileName,
 						tabs.join("\n")
 					);

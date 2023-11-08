@@ -35,9 +35,9 @@ export default class SettingsTab extends PluginSettingTab {
 			)
 			.addText((text) =>
 				text
-					.setValue(this.plugin.settings.internalSavePath)
+					.setValue(this.plugin.settings.vaultSavePath)
 					.onChange(async (value) => {
-						this.plugin.settings.internalSavePath = value;
+						this.plugin.settings.vaultSavePath = value;
 						await this.plugin.saveSettings();
 					})
 			);
