@@ -8,13 +8,13 @@ const exec = promisify(execCallback);
 interface ExportBrowserTabsSettings {
 	internalSavePath: string;
 	browserApplicationName: string;
-	fileNameFormat: string;
+	fileName: string;
 }
 
 const DEFAULT_SETTINGS: ExportBrowserTabsSettings = {
 	internalSavePath: "",
 	browserApplicationName: "",
-	fileNameFormat: "",
+	fileName: "",
 };
 
 export default class ExportBrowserTabs extends Plugin {
@@ -32,11 +32,16 @@ export default class ExportBrowserTabs extends Plugin {
 			name: "Export tabs",
 			callback: async () => {
 				try {
-					const numTabs = await this.exportBrowserTabs(
+					await this.createFolder(this.settings.internalSavePath);
+					const tabs = await this.exportBrowserTabs(
 						this.settings.browserApplicationName
 					);
+					await this.createFile(
+						this.settings.fileName,
+						tabs.join("\n")
+					);
 					new Notice(
-						`Exported ${numTabs} browser tabs from ${this.settings.browserApplicationName}`
+						`Exported ${tabs.length} browser tabs from ${this.settings.browserApplicationName}`
 					);
 				} catch (err) {
 					console.error(err);
@@ -81,10 +86,26 @@ export default class ExportBrowserTabs extends Plugin {
 
 		const { stdout, stderr } = await exec(`osascript -e '${appleScript}'`);
 		if (stderr) {
-			console.error(`stderr: ${stderr}`);
-			return;
+			throw new Error(stderr);
 		}
-		console.log(`stdout: ${stdout}`);
-		return 0;
+		const result = stdout.split(", ");
+		console.log("Result", result);
+		return result;
+	}
+
+	private async createFolder(folderPath: string) {
+		try {
+			await this.app.vault.createFolder(folderPath);
+		} catch (err) {
+			if (err.message === "Folder already exists") {
+				return;
+			}
+			throw err;
+		}
+	}
+
+	private async createFile(fileName: string, data: string) {
+		const filePath = fileName + Date.now() + ".md";
+		await this.app.vault.create(filePath, data);
 	}
 }
