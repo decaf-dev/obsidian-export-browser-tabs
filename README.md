@@ -10,7 +10,7 @@ This is a basic Obsidian plugin that allows MacOS users to export their open bro
 2. Enable the plugin
 3. Open the plugin settings
 4. Click **Add beta plugin**
-5. Enter the repository url with `.git`: **https://github.com/trey-wallis/obsidian-export-browser-tabs**
+5. Enter the repository url: **https://github.com/trey-wallis/obsidian-export-browser-tabs**
 6. Click **Add plugin**
 7. Navigate to the community plugins list
 8. Enable **Export Browser Tabs**
