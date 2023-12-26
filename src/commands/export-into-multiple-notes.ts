@@ -6,6 +6,7 @@ import { findLongestString, removeQuotations, removeTrailingPeriod, removeWebsit
 import { PluginSettings } from "src/types";
 import { pipeline } from "src/utils/pipeline";
 import { formatForFileSystem, trimForFileSystem } from "src/utils/file-system-utils";
+import { toSentenceCase } from "src/utils/string-utils";
 
 export const exportIntoMultipleNotesCommand = (
 	app: App,
@@ -33,7 +34,8 @@ const callback = (app: App, settings: PluginSettings) => async () => {
 			const titleString = titlePipeline(title);
 
 			const trimmed = trimForFileSystem(titleString as string, "md");
-			const fileName = `${trimmed}.md`;
+			const sentenceCase = toSentenceCase(trimmed);
+			const fileName = `${sentenceCase}.md`;
 
 			const filePath = `${vaultSavePath}/${fileName}`;
 			const data = getFrontmatterForFile(urlFrontmatterKey, url);
