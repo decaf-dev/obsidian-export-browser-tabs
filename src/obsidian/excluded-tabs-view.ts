@@ -1,7 +1,6 @@
 import { ItemView, Menu, WorkspaceLeaf } from "obsidian";
 import { EXCLUDED_TABS_VIEW } from "src/constants";
 import ExportBrowserTabsPlugin from "src/main";
-import { PluginSettings } from "src/types";
 
 export default class ExcludedTabsView extends ItemView {
 	plugin: ExportBrowserTabsPlugin;
@@ -28,13 +27,19 @@ export default class ExcludedTabsView extends ItemView {
 
 		const { settings } = this.plugin;
 		const { excludedTabs } = settings;
+
+		if (excludedTabs.length === 0) {
+			contentEl.createDiv({ cls: "pane-empty", text: "No excluded tabs found." });
+			return;
+		}
+
 		for (const tab of excludedTabs) {
-			const div = contentEl.createDiv({ cls: "is-clickable", text: tab.url });
+			const containerEl = contentEl.createDiv({ cls: "tree-item" });
+			const div = containerEl.createDiv({ cls: "tree-item-self is-clickable", text: tab.url });
 			div.addEventListener("contextmenu", (e) => {
 				const menu = new Menu();
 				menu.addItem((item) => {
 					item.setTitle("Remove");
-					item.setIcon("trash");
 					item.onClick(async () => {
 						const index = excludedTabs.findIndex((t) => t.url === tab.url);
 						if (index > -1) {
@@ -43,6 +48,7 @@ export default class ExcludedTabsView extends ItemView {
 							await this.plugin.saveSettings();
 							div.remove();
 						}
+						this.onOpen();
 					});
 				});
 				menu.setUseNativeMenu(true);
