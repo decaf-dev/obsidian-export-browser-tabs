@@ -31,12 +31,13 @@ export const createFile = async (
 	try {
 		const normalizedFilePath = normalizePath(filePath);
 		await app.vault.create(normalizedFilePath, data);
+		return true;
 	} catch (err) {
 		if (err.message.includes("already exists")) {
 			const errorMessage = `File already exists: ${filePath}`
 			new Notice(errorMessage);
 			console.error(errorMessage);
-			return;
+			return false;
 		}
 		throw err;
 	}

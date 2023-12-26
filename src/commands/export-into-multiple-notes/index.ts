@@ -35,9 +35,8 @@ const callback = (app: App, settings: PluginSettings) => async () => {
 			const { title, url } = tab;
 
 
-			if (excludedLinks.find(excluded => {
-				const { url: excludedUrl } = excluded;
-				return url.includes(excludedUrl)
+			if (excludedLinks.find(link => {
+				return url.includes(link)
 			})) {
 				console.log(`URL is excluded: ${url}`);
 				continue;
@@ -62,12 +61,13 @@ const callback = (app: App, settings: PluginSettings) => async () => {
 			const filePath = `${vaultSavePath}/${fileName}`;
 			const data = generateFrontmatter(urlFrontmatterKey, url);
 
-			await createFile(
+			const result = await createFile(
 				app,
 				filePath,
 				data
 			);
-			numExportedTabs++;
+			if (result)
+				numExportedTabs++;
 		}
 		new Notice(
 			`Exported ${numExportedTabs} browser tabs from ${browserApplicationName}`
