@@ -1,7 +1,7 @@
 import { App, Command, MarkdownView, Notice, TFile } from "obsidian";
 import EventManager from "src/event/event-manager";
 import ExportBrowserTabsPlugin from "src/main";
-import { getUrlForFile } from "src/utils/vault";
+import { getFrontmatterUrl } from "src/utils/vault";
 
 export const excludeUrlCommand = (app: App, plugin: ExportBrowserTabsPlugin): Command => {
 	return {
@@ -28,7 +28,7 @@ const preformAction = async (app: App, plugin: ExportBrowserTabsPlugin, file: TF
 	if (!file) {
 		return false;
 	}
-	const url = getUrlForFile(app, file);
+	const url = getFrontmatterUrl(app, file);
 	if (!url) {
 		new Notice("No URL found in frontmatter");
 		return false;
