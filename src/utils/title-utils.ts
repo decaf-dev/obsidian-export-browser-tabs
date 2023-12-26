@@ -28,6 +28,10 @@ export const removeWebsiteTitles = (value: string) => {
 	return value;
 }
 
+export const removeTrailingHyphen = (value: string) => {
+	return value.replace(/-$/, "");
+}
+
 /**
  * Finds the longest string in a string that is separated by a hyphen space `- ` or space hyphen ` -`
  * @param value - The value to format

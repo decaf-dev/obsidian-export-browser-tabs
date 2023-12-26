@@ -2,7 +2,7 @@ import { App, Command, Notice } from "obsidian";
 import { exportBrowserTabs } from "src/export/export";
 import { createFile, createFolder } from "src/utils/file-utils";
 import { getFrontmatterForFile } from "src/utils/frontmatter-utils";
-import { appendWebsiteTitle, findLongestString, getWebsiteTitle, removeQuotations, removeTrailingPeriod, removeWebsiteTitles, trimForObsidian } from "src/utils/title-utils";
+import { appendWebsiteTitle, getWebsiteTitle, removeTrailingHyphen, removeTrailingPeriod, removeWebsiteTitles, trimForObsidian } from "src/utils/title-utils";
 import { PluginSettings } from "src/types";
 import { pipeline } from "src/utils/pipeline";
 import { formatForFileSystem } from "src/utils/file-system-utils";
@@ -33,8 +33,8 @@ const callback = (app: App, settings: PluginSettings) => async () => {
 		for (const tab of tabs) {
 			const { title, url } = tab;
 
-			const titlePipeline = pipeline(formatForFileSystem, removeQuotations, removeWebsiteTitles, findLongestString, removeTrailingPeriod);
-			const titleString = titlePipeline(title);
+			const titlePipeline = pipeline(formatForFileSystem, removeWebsiteTitles, removeTrailingHyphen, removeTrailingPeriod);
+			const titleString = (titlePipeline(title) as string).trim();
 
 			const websiteTitle = getWebsiteTitle(url);
 			const trimmed = trimForObsidian(titleString as string, websiteTitle, "md");
