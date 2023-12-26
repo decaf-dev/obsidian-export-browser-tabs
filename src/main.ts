@@ -5,7 +5,7 @@ import { exportIntoMultipleNotesCommand } from "./commands/export-into-multiple-
 import { PluginSettings } from "./types";
 import { EXCLUDED_TABS_VIEW } from "./constants";
 import ExcludedTabsView from "./obsidian/excluded-tabs-view";
-import { viewExcludedTabsCommand } from "./commands/view-excluded-tabs";
+import { showExcludedTabsCommand } from "./commands/show-excluded-tabs";
 
 const DEFAULT_SETTINGS: PluginSettings = {
 	vaultSavePath: "",
@@ -27,13 +27,13 @@ export default class ExportBrowserTabsPlugin extends Plugin {
 
 		this.registerView(
 			EXCLUDED_TABS_VIEW,
-			(leaf) => new ExcludedTabsView(leaf, this.settings),
+			(leaf) => new ExcludedTabsView(leaf, this),
 		);
 
 		// Register commands
 		this.addCommand(exportIntoSingleNoteCommand(this.app, this.settings));
 		this.addCommand(exportIntoMultipleNotesCommand(this.app, this.settings));
-		this.addCommand(viewExcludedTabsCommand(this.app));
+		this.addCommand(showExcludedTabsCommand(this.app));
 	}
 
 	onunload() { }

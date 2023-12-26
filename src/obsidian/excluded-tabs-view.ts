@@ -5,11 +5,10 @@ import { PluginSettings } from "src/types";
 
 export default class ExcludedTabsView extends ItemView {
 	plugin: ExportBrowserTabsPlugin;
-	settings: PluginSettings;
 
-	constructor(leaf: WorkspaceLeaf, plugin: ExportBrowserTabsPlugin, settings: PluginSettings) {
+	constructor(leaf: WorkspaceLeaf, plugin: ExportBrowserTabsPlugin) {
 		super(leaf);
-		this.settings = settings;
+		this.plugin = plugin;
 	}
 
 	getViewType() {
@@ -27,7 +26,8 @@ export default class ExcludedTabsView extends ItemView {
 	async onOpen() {
 		const { contentEl } = this;
 
-		const { excludedTabs } = this.settings;
+		const { settings } = this.plugin;
+		const { excludedTabs } = settings;
 		for (const tab of excludedTabs) {
 			const div = contentEl.createDiv({ cls: "is-clickable", text: tab.url });
 			div.addEventListener("contextmenu", (e) => {
@@ -39,7 +39,7 @@ export default class ExcludedTabsView extends ItemView {
 						const index = excludedTabs.findIndex((t) => t.url === tab.url);
 						if (index > -1) {
 							excludedTabs.splice(index, 1);
-							this.settings.excludedTabs = excludedTabs;
+							this.plugin.settings.excludedTabs = excludedTabs;
 							await this.plugin.saveSettings();
 							div.remove();
 						}

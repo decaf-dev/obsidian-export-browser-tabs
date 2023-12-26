@@ -1,10 +1,10 @@
 import { App, Command } from "obsidian";
 import { EXCLUDED_TABS_VIEW } from "src/constants";
 
-export const viewExcludedTabsCommand = (app: App): Command => {
+export const showExcludedTabsCommand = (app: App): Command => {
 	return {
-		id: "view-excluded-tabs",
-		name: "View excluded tabs",
+		id: "show-excluded-tabs",
+		name: "Show excluded tabs",
 		callback: async () => {
 			const leaf = app.workspace.getLeavesOfType(EXCLUDED_TABS_VIEW)[0];
 			if (leaf) {
