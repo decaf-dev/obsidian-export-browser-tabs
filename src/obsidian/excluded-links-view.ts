@@ -48,6 +48,7 @@ export default class ExcludedLinksView extends ItemView {
 							await this.plugin.saveSettings();
 							div.remove();
 						}
+						this.onClose();
 						this.onOpen();
 					});
 				});
