@@ -2,7 +2,7 @@
 
 ## About
 
-This is a basic Obsidian plugin that allows MacOS users to export their open browser tabs to a note in Obsidian. This is useful to organize your tabs in Obsidian for future use.
+This is an Obsidian.md plugin that allows MacOS users to export their open browser tabs. This is useful if you wish to archive your tabs for future use.
 
 ## Installation
 
@@ -29,7 +29,8 @@ This plugin executes AppleScript. It will only work on a MacOS system.
 
 1. Open the Obsidian command prompt (cmd + shift + p)
 2. Type `Export tabs`
-3. Press enter
+3. Select `Export tabs into single note` or `Export tabs into multiple notes`
+4. Press enter
 
 ## Development
 
