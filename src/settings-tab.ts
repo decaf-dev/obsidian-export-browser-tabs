@@ -14,6 +14,15 @@ export default class SettingsTab extends PluginSettingTab {
 
 		containerEl.empty();
 
+		this.renderGeneralSettings(containerEl);
+		this.addSingleNoteSettings(containerEl);
+		this.renderMultipleNoteSettings(containerEl);
+
+	}
+
+	renderGeneralSettings(containerEl: HTMLElement): void {
+		new Setting(containerEl).setHeading().setName("General");
+
 		new Setting(containerEl)
 			.setName("Browser application name")
 			.setDesc(
@@ -27,6 +36,11 @@ export default class SettingsTab extends PluginSettingTab {
 						await this.plugin.saveSettings();
 					})
 			);
+	}
+
+	addSingleNoteSettings(containerEl: HTMLElement): void {
+		new Setting(containerEl).setHeading().setName("Export into single note");
+
 
 		new Setting(containerEl)
 			.setName("Folder save path")
@@ -52,6 +66,38 @@ export default class SettingsTab extends PluginSettingTab {
 					.setValue(this.plugin.settings.fileName)
 					.onChange(async (value) => {
 						this.plugin.settings.fileName = value;
+						await this.plugin.saveSettings();
+					})
+			);
+	}
+
+	renderMultipleNoteSettings(containerEl: HTMLElement): void {
+		new Setting(containerEl).setHeading().setName("Export into multiple notes");
+
+		new Setting(containerEl)
+			.setName("URL frontmatter key")
+			.setDesc(
+				"The frontmatter key that the URL will be saved under."
+			)
+			.addText((text) =>
+				text
+					.setValue(this.plugin.settings.urlFrontmatterKey)
+					.onChange(async (value) => {
+						this.plugin.settings.urlFrontmatterKey = value;
+						await this.plugin.saveSettings();
+					})
+			);
+
+		new Setting(containerEl)
+			.setName("Append website type")
+			.setDesc(
+				"Appends a website type to the end of the title. For example, if the website includes 'YouTube', (YouTube) will be appended to the end of the title."
+			)
+			.addToggle((text) =>
+				text
+					.setValue(this.plugin.settings.appendWebsiteType)
+					.onChange(async (value) => {
+						this.plugin.settings.appendWebsiteType = value;
 						await this.plugin.saveSettings();
 					})
 			);

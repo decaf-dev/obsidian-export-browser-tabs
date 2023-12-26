@@ -1,24 +1,19 @@
-import { Notice, Plugin, normalizePath } from "obsidian";
-import { exec as execCallback } from "child_process";
-import { promisify } from "util";
+import { Plugin } from "obsidian";
 import SettingsTab from "./settings-tab";
+import { exportIntoSingleNoteCommand } from "./commands/export-into-single-note";
+import { exportIntoMultipleNotesCommand } from "./commands/export-into-multiple-notes";
+import { PluginSettings } from "./types";
 
-const exec = promisify(execCallback);
-
-interface ExportBrowserTabsSettings {
-	vaultSavePath: string;
-	browserApplicationName: string;
-	fileName: string;
-}
-
-const DEFAULT_SETTINGS: ExportBrowserTabsSettings = {
+const DEFAULT_SETTINGS: PluginSettings = {
 	vaultSavePath: "",
 	browserApplicationName: "",
 	fileName: "Browser tabs",
+	urlFrontmatterKey: "url",
+	appendWebsiteType: false,
 };
 
 export default class ExportBrowserTabs extends Plugin {
-	settings: ExportBrowserTabsSettings;
+	settings: PluginSettings;
 
 	async onload() {
 		await this.loadSettings();
@@ -26,61 +21,9 @@ export default class ExportBrowserTabs extends Plugin {
 		// This adds a settings tab so the user can configure various aspects of the plugin
 		this.addSettingTab(new SettingsTab(this.app, this));
 
-		// This adds a simple command that can be triggered anywhere
-		this.addCommand({
-			id: "export-tabs",
-			name: "Export tabs",
-			callback: async () => {
-				try {
-					await this.createFolder(this.settings.vaultSavePath);
-					const tabs = await this.exportBrowserTabs(
-						this.settings.browserApplicationName
-					);
-					const markdownLinks = tabs.map(
-						(tab) => `[${tab.title}](${tab.url})`
-					);
-					await this.createFile(
-						this.settings.vaultSavePath,
-						this.settings.fileName,
-						markdownLinks.join("\n\n")
-					);
-					new Notice(
-						`Exported ${tabs.length} browser tabs from ${this.settings.browserApplicationName}`
-					);
-				} catch (err) {
-					console.error(err);
-					new Notice(`Error exporting browser tabs: ${err.message}`);
-				}
-			},
-		});
-
-		// This adds a simple command that can be triggered anywhere
-		this.addCommand({
-			id: "export-remote-tabs",
-			name: "Export remote tabs",
-			callback: async () => {
-				try {
-					await this.createFolder(this.settings.vaultSavePath);
-					const tabs = await this.exportBrowserTabs(
-						this.settings.browserApplicationName
-					);
-					const markdownLinks = tabs.map(
-						(tab) => `[${tab.title}](${tab.url})`
-					);
-					await this.createFile(
-						this.settings.vaultSavePath,
-						this.settings.fileName,
-						markdownLinks.join("\n\n")
-					);
-					new Notice(
-						`Exported ${tabs.length} browser tabs from ${this.settings.browserApplicationName}`
-					);
-				} catch (err) {
-					console.error(err);
-					new Notice(`Error exporting browser tabs: ${err.message}`);
-				}
-			},
-		});
+		// Register commands
+		this.addCommand(exportIntoSingleNoteCommand(this.app, this.settings));
+		this.addCommand(exportIntoMultipleNotesCommand(this.app, this.settings));
 	}
 
 	onunload() { }
@@ -95,63 +38,5 @@ export default class ExportBrowserTabs extends Plugin {
 
 	async saveSettings() {
 		await this.saveData(this.settings);
-	}
-
-	private async exportBrowserTabs(browserApplicationName: string) {
-		if (browserApplicationName === "") {
-			throw new Error(
-				"No browser application name specified. Please set one in the plugin settings."
-			);
-		}
-
-		const appleScript = `
-			tell application "${browserApplicationName}"
-				set tabInfoList to ""
-				repeat with theWindow in (every window)
-					repeat with theTab in (every tab of theWindow)
-						set tabInfoList to tabInfoList & the URL of theTab & "|" & the title of theTab & "\n"
-					end repeat
-				end repeat
-				return tabInfoList
-			end tell
-		`;
-
-		const { stdout, stderr } = await exec(`osascript -e '${appleScript}'`);
-		if (stderr) {
-			throw new Error(stderr);
-		}
-		const tabs = stdout
-			.trim()
-			.split("\n")
-			.map((entry) => {
-				// Split the entry by the first occurrence of "|"
-				const [url, ...titleParts] = entry.split("|");
-				const title = titleParts.join("|"); // Rejoin the title in case it contains "|"
-				return { url, title };
-			});
-
-		//console.log("Tabs", tabs);
-		return tabs;
-	}
-
-	private async createFolder(folderPath: string) {
-		try {
-			await this.app.vault.createFolder(folderPath);
-		} catch (err) {
-			if (err.message.includes("already exists")) {
-				return;
-			}
-			throw err;
-		}
-	}
-
-	private async createFile(
-		vaultSavePath: string,
-		fileName: string,
-		data: string
-	) {
-		const newFilePath = `${vaultSavePath}/${fileName} ${Date.now()}.md`;
-		const normalizedFilePath = normalizePath(newFilePath);
-		await this.app.vault.create(normalizedFilePath, data);
 	}
 }
