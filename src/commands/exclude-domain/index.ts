@@ -1,4 +1,5 @@
-import { App, Command, MarkdownView, Notice } from "obsidian";
+import { App, Command, MarkdownView, Notice, TFile } from "obsidian";
+import EventManager from "src/event/event-manager";
 import ExportBrowserTabsPlugin from "src/main";
 import { getUrlForFile } from "src/utils/vault";
 
@@ -14,22 +15,26 @@ export const excludeDomainCommand = (app: App, plugin: ExportBrowserTabsPlugin):
 				return false;
 			}
 			if (!checking) {
-				const file = markdownView.file;
-				if (!file) {
-					return false;
-				}
-				const url = getUrlForFile(app, file);
-				if (!url) {
-					new Notice("No URL found in frontmatter");
-					return false;
-				}
-				const domain = new URL(url).hostname;
-				plugin.settings.excludedLinks.push({ url: domain });
-				plugin.saveSettings();
-				new Notice(`Excluded domain: ${domain}`);
+				preformAction(app, plugin, markdownView.file);
 			}
 			return true;
 
 		},
 	}
+}
+
+const preformAction = async (app: App, plugin: ExportBrowserTabsPlugin, file: TFile | null) => {
+	if (!file) {
+		return false;
+	}
+	const url = getUrlForFile(app, file);
+	if (!url) {
+		new Notice("No URL found in frontmatter");
+		return false;
+	}
+	const domain = new URL(url).hostname;
+	plugin.settings.excludedLinks.push({ url: domain });
+	await plugin.saveSettings();
+	EventManager.getInstance().emit("refresh-item-view");
+	new Notice(`Excluded domain: ${domain}`);
 }

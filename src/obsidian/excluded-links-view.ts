@@ -1,5 +1,6 @@
 import { ItemView, Menu, WorkspaceLeaf } from "obsidian";
 import { EXCLUDED_LINKS_VIEW } from "src/constants";
+import EventManager from "src/event/event-manager";
 import ExportBrowserTabsPlugin from "src/main";
 
 export default class ExcludedLinksView extends ItemView {
@@ -28,6 +29,8 @@ export default class ExcludedLinksView extends ItemView {
 		const { settings } = this.plugin;
 		const { excludedLinks } = settings;
 
+		EventManager.getInstance().on("refresh-item-view", this.handleRefreshEvent);
+
 		if (excludedLinks.length === 0) {
 			contentEl.createDiv({ cls: "pane-empty", text: "No excluded links found." });
 			return;
@@ -48,13 +51,24 @@ export default class ExcludedLinksView extends ItemView {
 							await this.plugin.saveSettings();
 							div.remove();
 						}
-						this.onClose();
-						this.onOpen();
+						this.handleRefreshEvent();
 					});
 				});
 				menu.setUseNativeMenu(true);
 				menu.showAtPosition({ x: e.clientX, y: e.clientY });
 			});
 		}
+	}
+
+	async onClose() {
+		const { contentEl } = this;
+		contentEl.empty();
+
+		EventManager.getInstance().off("refresh-item-view", this.handleRefreshEvent);
+	}
+
+	private handleRefreshEvent = () => {
+		this.onClose();
+		this.onOpen();
 	}
 }

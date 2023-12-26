@@ -1,4 +1,5 @@
-import { App, Command, MarkdownView, Notice } from "obsidian";
+import { App, Command, MarkdownView, Notice, TFile } from "obsidian";
+import EventManager from "src/event/event-manager";
 import ExportBrowserTabsPlugin from "src/main";
 import { getUrlForFile } from "src/utils/vault";
 
@@ -14,21 +15,27 @@ export const excludeUrlCommand = (app: App, plugin: ExportBrowserTabsPlugin): Co
 				return false;
 			}
 			if (!checking) {
-				const file = markdownView.file;
-				if (!file) {
-					return false;
-				}
-				const url = getUrlForFile(app, file);
-				if (!url) {
-					new Notice("No URL found in frontmatter");
-					return false;
-				}
-				plugin.settings.excludedLinks.push({ url });
-				plugin.saveSettings();
-				new Notice(`Excluded url: ${url}`);
+				preformAction(app, plugin, markdownView.file)
 			}
 			return true;
 
 		},
 	}
+}
+
+
+const preformAction = async (app: App, plugin: ExportBrowserTabsPlugin, file: TFile | null) => {
+	if (!file) {
+		return false;
+	}
+	const url = getUrlForFile(app, file);
+	if (!url) {
+		new Notice("No URL found in frontmatter");
+		return false;
+	}
+	plugin.settings.excludedLinks.push({ url });
+	await plugin.saveSettings();
+
+	EventManager.getInstance().emit("refresh-item-view");
+	new Notice(`Excluded url: ${url}`);
 }
