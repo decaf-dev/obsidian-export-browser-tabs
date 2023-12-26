@@ -1,5 +1,5 @@
 import { PluginSettingTab, App, Setting } from "obsidian";
-import ExportBrowserTabs from "./main";
+import ExportBrowserTabs from "../main";
 
 export default class SettingsTab extends PluginSettingTab {
 	plugin: ExportBrowserTabs;

@@ -1,5 +1,5 @@
 import { Plugin } from "obsidian";
-import SettingsTab from "./settings-tab";
+import SettingsTab from "./obsidian/settings-tab";
 import { exportIntoSingleNoteCommand } from "./commands/export-into-single-note";
 import { exportIntoMultipleNotesCommand } from "./commands/export-into-multiple-notes";
 import { PluginSettings } from "./types";
