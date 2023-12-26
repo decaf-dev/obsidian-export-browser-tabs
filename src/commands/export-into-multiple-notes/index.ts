@@ -21,7 +21,7 @@ export const exportIntoMultipleNotesCommand = (
 };
 
 const callback = (app: App, settings: PluginSettings) => async () => {
-	const { vaultSavePath, browserApplicationName, urlFrontmatterKey } = settings;
+	const { vaultSavePath, browserApplicationName, urlFrontmatterKey, excludedTabs } = settings;
 	try {
 		await createFolder(app, vaultSavePath);
 		const tabs = await exportBrowserTabs(
@@ -52,6 +52,14 @@ const callback = (app: App, settings: PluginSettings) => async () => {
 				console.log(`URL already exists in vault: ${url}`);
 				continue;
 			}
+
+			if (excludedTabs.find(tab => {
+				const { url: excludedUrl } = tab;
+				return url.includes(excludedUrl)
+			})) {
+				continue;
+			}
+
 			await createFile(
 				app,
 				filePath,
