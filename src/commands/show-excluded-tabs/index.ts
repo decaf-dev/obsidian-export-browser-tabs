@@ -1,17 +1,17 @@
 import { App, Command } from "obsidian";
-import { EXCLUDED_TABS_VIEW } from "src/constants";
+import { EXCLUDED_LINKS_VIEW } from "src/constants";
 
-export const showExcludedTabsCommand = (app: App): Command => {
+export const showExcludedLinksCommand = (app: App): Command => {
 	return {
-		id: "show-excluded-tabs",
-		name: "Show excluded tabs",
+		id: "show-excluded-links",
+		name: "Show excluded links",
 		callback: async () => {
-			const leaf = app.workspace.getLeavesOfType(EXCLUDED_TABS_VIEW)[0];
+			const leaf = app.workspace.getLeavesOfType(EXCLUDED_LINKS_VIEW)[0];
 			if (leaf) {
 				app.workspace.revealLeaf(leaf);
 			} else {
 				app.workspace.getRightLeaf(false).setViewState({
-					type: EXCLUDED_TABS_VIEW,
+					type: EXCLUDED_LINKS_VIEW,
 					active: true,
 				})
 			}

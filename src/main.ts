@@ -3,9 +3,10 @@ import SettingsTab from "./obsidian/settings-tab";
 import { exportIntoSingleNoteCommand } from "./commands/export-into-single-note";
 import { exportIntoMultipleNotesCommand } from "./commands/export-into-multiple-notes";
 import { PluginSettings } from "./types";
-import { EXCLUDED_TABS_VIEW } from "./constants";
-import ExcludedTabsView from "./obsidian/excluded-tabs-view";
-import { showExcludedTabsCommand } from "./commands/show-excluded-tabs";
+import { EXCLUDED_LINKS_VIEW } from "./constants";
+import ExcludedTabsView from "./obsidian/excluded-links-view";
+import { showExcludedLinksCommand } from "./commands/show-excluded-tabs";
+import { excludeUrlCommand } from "./commands/exclude-url";
 
 const DEFAULT_SETTINGS: PluginSettings = {
 	vaultSavePath: "",
@@ -13,7 +14,7 @@ const DEFAULT_SETTINGS: PluginSettings = {
 	fileName: "Browser tabs",
 	urlFrontmatterKey: "url",
 	appendWebsiteType: false,
-	excludedTabs: [],
+	excludedLinks: [],
 };
 
 export default class ExportBrowserTabsPlugin extends Plugin {
@@ -26,14 +27,15 @@ export default class ExportBrowserTabsPlugin extends Plugin {
 		this.addSettingTab(new SettingsTab(this.app, this));
 
 		this.registerView(
-			EXCLUDED_TABS_VIEW,
+			EXCLUDED_LINKS_VIEW,
 			(leaf) => new ExcludedTabsView(leaf, this),
 		);
 
 		// Register commands
 		this.addCommand(exportIntoSingleNoteCommand(this.app, this.settings));
 		this.addCommand(exportIntoMultipleNotesCommand(this.app, this.settings));
-		this.addCommand(showExcludedTabsCommand(this.app));
+		this.addCommand(showExcludedLinksCommand(this.app));
+		this.addCommand(excludeUrlCommand(this.app, this));
 	}
 
 	onunload() { }

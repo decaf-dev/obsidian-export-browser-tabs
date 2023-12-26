@@ -4,9 +4,9 @@ export interface PluginSettings {
 	fileName: string;
 	urlFrontmatterKey: string;
 	appendWebsiteType: boolean;
-	excludedTabs: ExcludedTab[];
+	excludedLinks: ExcludedLink[];
 }
 
-export interface ExcludedTab {
+export interface ExcludedLink {
 	url: string;
 }

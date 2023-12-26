@@ -1,8 +1,8 @@
 import { ItemView, Menu, WorkspaceLeaf } from "obsidian";
-import { EXCLUDED_TABS_VIEW } from "src/constants";
+import { EXCLUDED_LINKS_VIEW } from "src/constants";
 import ExportBrowserTabsPlugin from "src/main";
 
-export default class ExcludedTabsView extends ItemView {
+export default class ExcludedLinksView extends ItemView {
 	plugin: ExportBrowserTabsPlugin;
 
 	constructor(leaf: WorkspaceLeaf, plugin: ExportBrowserTabsPlugin) {
@@ -11,11 +11,11 @@ export default class ExcludedTabsView extends ItemView {
 	}
 
 	getViewType() {
-		return EXCLUDED_TABS_VIEW;
+		return EXCLUDED_LINKS_VIEW;
 	}
 
 	getDisplayText() {
-		return "Excluded tabs";
+		return "Excluded links";
 	}
 
 	getIcon() {
@@ -26,25 +26,25 @@ export default class ExcludedTabsView extends ItemView {
 		const { contentEl } = this;
 
 		const { settings } = this.plugin;
-		const { excludedTabs } = settings;
+		const { excludedLinks } = settings;
 
-		if (excludedTabs.length === 0) {
-			contentEl.createDiv({ cls: "pane-empty", text: "No excluded tabs found." });
+		if (excludedLinks.length === 0) {
+			contentEl.createDiv({ cls: "pane-empty", text: "No excluded links found." });
 			return;
 		}
 
-		for (const tab of excludedTabs) {
+		for (const link of excludedLinks) {
 			const containerEl = contentEl.createDiv({ cls: "tree-item" });
-			const div = containerEl.createDiv({ cls: "tree-item-self is-clickable", text: tab.url });
+			const div = containerEl.createDiv({ cls: "tree-item-self is-clickable", text: link.url });
 			div.addEventListener("contextmenu", (e) => {
 				const menu = new Menu();
 				menu.addItem((item) => {
 					item.setTitle("Remove");
 					item.onClick(async () => {
-						const index = excludedTabs.findIndex((t) => t.url === tab.url);
+						const index = excludedLinks.findIndex((t) => t.url === link.url);
 						if (index > -1) {
-							excludedTabs.splice(index, 1);
-							this.plugin.settings.excludedTabs = excludedTabs;
+							excludedLinks.splice(index, 1);
+							this.plugin.settings.excludedLinks = excludedLinks;
 							await this.plugin.saveSettings();
 							div.remove();
 						}

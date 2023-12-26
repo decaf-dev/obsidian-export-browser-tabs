@@ -1,1 +1,1 @@
-export const EXCLUDED_TABS_VIEW = "excluded-tabs";
+export const EXCLUDED_LINKS_VIEW = "excluded-links";

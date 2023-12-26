@@ -1,7 +1,7 @@
 import { App, Command, Notice } from "obsidian";
 import { exportBrowserTabs } from "src/export/export";
 import { createFile, createFolder } from "src/utils/file-utils";
-import { getFrontmatterForFile } from "src/utils/frontmatter-utils";
+import { generateFrontmatter } from "src/utils/frontmatter-utils";
 import { appendWebsiteTitle, getWebsiteTitle, removeTrailingHyphen, removeTrailingPeriod, removeWebsiteTitles, trimForObsidian } from "src/utils/title-utils";
 import { PluginSettings } from "src/types";
 import { pipeline } from "src/utils/pipeline";
@@ -21,7 +21,7 @@ export const exportIntoMultipleNotesCommand = (
 };
 
 const callback = (app: App, settings: PluginSettings) => async () => {
-	const { vaultSavePath, browserApplicationName, urlFrontmatterKey, excludedTabs } = settings;
+	const { vaultSavePath, browserApplicationName, urlFrontmatterKey, excludedLinks } = settings;
 	try {
 		await createFolder(app, vaultSavePath);
 		const tabs = await exportBrowserTabs(
@@ -46,15 +46,15 @@ const callback = (app: App, settings: PluginSettings) => async () => {
 			const fileName = `${titleWithWebsite}.md`;
 
 			const filePath = `${vaultSavePath}/${fileName}`;
-			const data = getFrontmatterForFile(urlFrontmatterKey, url);
+			const data = generateFrontmatter(urlFrontmatterKey, url);
 
 			if (doesUrlExist(app, url)) {
 				console.log(`URL already exists in vault: ${url}`);
 				continue;
 			}
 
-			if (excludedTabs.find(tab => {
-				const { url: excludedUrl } = tab;
+			if (excludedLinks.find(excluded => {
+				const { url: excludedUrl } = excluded;
 				return url.includes(excludedUrl)
 			})) {
 				continue;
