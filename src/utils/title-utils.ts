@@ -17,6 +17,7 @@ export const removeTrailingPeriod = (value: string) => {
 export const removeWebsiteTitles = (value: string) => {
 	value = value.replace(/- YouTube$/, "");
 	value = value.replace(/- Search X$/, "");
+	value = value.replace(/- Wikipedia$/, "");
 	value = value.replace(/ X$/, "");
 	value = value.trim();
 	return value;
@@ -57,6 +58,8 @@ export const getWebsiteTitle = (url: string) => {
 		return "GitHub";
 	} else if (url.includes("medium.com")) {
 		return "Medium";
+	} else if (url.includes("wikipedia.com")) {
+		return "Wikipedia";
 	} else {
 		return "Website"
 	}
