@@ -1,13 +1,13 @@
 import { ItemView, WorkspaceLeaf } from "obsidian";
-import { EXCLUDED_TABS_VIEW } from "src/constants";
+import { EXCLUDED_VIEW } from "src/constants";
 
-export default class ExcludedTabsView extends ItemView {
+export default class ExcludedView extends ItemView {
 	constructor(leaf: WorkspaceLeaf) {
 		super(leaf);
 	}
 
 	getViewType() {
-		return EXCLUDED_TABS_VIEW;
+		return EXCLUDED_VIEW;
 	}
 
 	getDisplayText() {

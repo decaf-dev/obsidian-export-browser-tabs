@@ -4,7 +4,7 @@ import { exportIntoSingleNoteCommand } from "./commands/export-into-single-note"
 import { exportIntoMultipleNotesCommand } from "./commands/export-into-multiple-notes";
 import { PluginSettings } from "./types";
 import ExcludedTabsView from "./obsidian/excluded-tabs-view";
-import { viewExcludedTabsCommand } from "./commands/view-excluded-tabs";
+import { viewExcludedCommand } from "./commands/view-excluded-tabs";
 import { EXCLUDED_TABS_VIEW } from "./constants";
 
 const DEFAULT_SETTINGS: PluginSettings = {
@@ -32,7 +32,7 @@ export default class ExportBrowserTabsPlugin extends Plugin {
 		// Register commands
 		this.addCommand(exportIntoSingleNoteCommand(this.app, this.settings));
 		this.addCommand(exportIntoMultipleNotesCommand(this.app, this.settings));
-		this.addCommand(viewExcludedTabsCommand(this.app));
+		this.addCommand(viewExcludedCommand(this.app));
 	}
 
 	onunload() { }
