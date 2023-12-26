@@ -1,7 +1,7 @@
 import { Notice, Plugin, normalizePath } from "obsidian";
 import { exec as execCallback } from "child_process";
 import { promisify } from "util";
-import SettingsTab from "./settings_tab";
+import SettingsTab from "./settings-tab";
 
 const exec = promisify(execCallback);
 
@@ -28,8 +28,36 @@ export default class ExportBrowserTabs extends Plugin {
 
 		// This adds a simple command that can be triggered anywhere
 		this.addCommand({
-			id: "export-browser-tabs",
+			id: "export-tabs",
 			name: "Export tabs",
+			callback: async () => {
+				try {
+					await this.createFolder(this.settings.vaultSavePath);
+					const tabs = await this.exportBrowserTabs(
+						this.settings.browserApplicationName
+					);
+					const markdownLinks = tabs.map(
+						(tab) => `[${tab.title}](${tab.url})`
+					);
+					await this.createFile(
+						this.settings.vaultSavePath,
+						this.settings.fileName,
+						markdownLinks.join("\n\n")
+					);
+					new Notice(
+						`Exported ${tabs.length} browser tabs from ${this.settings.browserApplicationName}`
+					);
+				} catch (err) {
+					console.error(err);
+					new Notice(`Error exporting browser tabs: ${err.message}`);
+				}
+			},
+		});
+
+		// This adds a simple command that can be triggered anywhere
+		this.addCommand({
+			id: "export-remote-tabs",
+			name: "Export remote tabs",
 			callback: async () => {
 				try {
 					await this.createFolder(this.settings.vaultSavePath);
@@ -55,7 +83,7 @@ export default class ExportBrowserTabs extends Plugin {
 		});
 	}
 
-	onunload() {}
+	onunload() { }
 
 	async loadSettings() {
 		this.settings = Object.assign(
