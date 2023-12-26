@@ -3,6 +3,9 @@ import SettingsTab from "./obsidian/settings-tab";
 import { exportIntoSingleNoteCommand } from "./commands/export-into-single-note";
 import { exportIntoMultipleNotesCommand } from "./commands/export-into-multiple-notes";
 import { PluginSettings } from "./types";
+import ExcludedTabsView from "./obsidian/excluded-tabs-view";
+import { viewExcludedTabsCommand } from "./commands/view-excluded-tabs";
+import { EXCLUDED_TABS_VIEW } from "./constants";
 
 const DEFAULT_SETTINGS: PluginSettings = {
 	vaultSavePath: "",
@@ -12,7 +15,7 @@ const DEFAULT_SETTINGS: PluginSettings = {
 	appendWebsiteType: false,
 };
 
-export default class ExportBrowserTabs extends Plugin {
+export default class ExportBrowserTabsPlugin extends Plugin {
 	settings: PluginSettings;
 
 	async onload() {
@@ -21,9 +24,15 @@ export default class ExportBrowserTabs extends Plugin {
 		// This adds a settings tab so the user can configure various aspects of the plugin
 		this.addSettingTab(new SettingsTab(this.app, this));
 
+		this.registerView(
+			EXCLUDED_TABS_VIEW,
+			(leaf) => new ExcludedTabsView(leaf),
+		);
+
 		// Register commands
 		this.addCommand(exportIntoSingleNoteCommand(this.app, this.settings));
 		this.addCommand(exportIntoMultipleNotesCommand(this.app, this.settings));
+		this.addCommand(viewExcludedTabsCommand(this.app));
 	}
 
 	onunload() { }
