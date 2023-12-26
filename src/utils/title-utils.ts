@@ -18,6 +18,11 @@ export const removeWebsiteTitles = (value: string) => {
 	value = value.replace(/YouTube$/, "");
 	value = value.replace(/Search X$/, "");
 	value = value.replace(/Wikipedia$/, "");
+	value = value.replace(/Amazon$/, "");
+	value = value.replace(/Medium$/, "");
+	value = value.replace(/GitHub$/, "");
+	value = value.replace(/Instagram$/, "");
+	value = value.replace(/Pintrest$/, "");
 	value = value.replace(/X$/, "");
 	value = value.trim();
 	return value;
@@ -60,6 +65,8 @@ export const getWebsiteTitle = (url: string) => {
 		return "Medium";
 	} else if (url.includes("wikipedia.com")) {
 		return "Wikipedia";
+	} else if (url.includes("amazon.com")) {
+		return "Amazon";
 	} else {
 		return "Website"
 	}
