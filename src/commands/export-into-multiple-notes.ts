@@ -2,7 +2,7 @@ import { App, Command, Notice } from "obsidian";
 import { exportBrowserTabs } from "src/export/export";
 import { createFile, createFolder } from "src/utils/file-utils";
 import { getFrontmatterForFile } from "src/utils/frontmatter-utils";
-import { findLongestString, removeQuotations, removeTrailingPeriod, removeWebsiteTitles, trimForObsidian } from "src/utils/title-utils";
+import { appendWebsiteTitle, findLongestString, getWebsiteTitle, removeQuotations, removeTrailingPeriod, removeWebsiteTitles, trimForObsidian } from "src/utils/title-utils";
 import { PluginSettings } from "src/types";
 import { pipeline } from "src/utils/pipeline";
 import { formatForFileSystem, trimForFileSystem } from "src/utils/file-system-utils";
@@ -33,9 +33,13 @@ const callback = (app: App, settings: PluginSettings) => async () => {
 			const titlePipeline = pipeline(formatForFileSystem, removeQuotations, removeWebsiteTitles, findLongestString, removeTrailingPeriod);
 			const titleString = titlePipeline(title);
 
-			const trimmed = trimForObsidian(titleString as string, "md");
+			const websiteTitle = getWebsiteTitle(url);
+			const trimmed = trimForObsidian(titleString as string, websiteTitle, "md");
+
 			const sentenceCase = toSentenceCase(trimmed);
-			const fileName = `${sentenceCase}.md`;
+			const titleWithWebsite = appendWebsiteTitle(sentenceCase, websiteTitle);
+
+			const fileName = `${titleWithWebsite}.md`;
 
 			const filePath = `${vaultSavePath}/${fileName}`;
 			const data = getFrontmatterForFile(urlFrontmatterKey, url);

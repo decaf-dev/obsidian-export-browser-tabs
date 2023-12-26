@@ -39,7 +39,29 @@ export const findLongestString = (value: string) => {
 	return title;
 }
 
-export const trimForObsidian = (value: string, extension: string) => {
+export const trimForObsidian = (value: string, websiteTitle: string, extension: string) => {
 	const MAX_LENGTH = 150;
-	return value.substring(0, MAX_LENGTH - extension.length - 1);
+	return value.substring(0, MAX_LENGTH - websiteTitle.length - 1 - extension.length - 1);
+}
+
+export const getWebsiteTitle = (url: string) => {
+	if (url.includes("youtube.com")) {
+		return "YouTube";
+	} else if (url.includes("x.com") || (url.includes("twitter.com"))) {
+		return "X";
+	} else if (url.includes("instagram.com")) {
+		return "Instagram";
+	} else if (url.includes("pintrest.com")) {
+		return "Pintrest";
+	} else if (url.includes("github.com")) {
+		return "GitHub";
+	} else if (url.includes("medium.com")) {
+		return "Medium";
+	} else {
+		return "Website"
+	}
+}
+
+export const appendWebsiteTitle = (value: string, websiteTitle: string) => {
+	return `${value} (${websiteTitle})`;
 }
