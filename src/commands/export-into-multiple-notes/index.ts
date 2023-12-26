@@ -27,8 +27,9 @@ const callback = (app: App, settings: PluginSettings) => async () => {
 		const tabs = await exportBrowserTabs(
 			browserApplicationName
 		);
+		console.log(`Found ${tabs.length} browser tabs`);
 
-		let numExported = 0;
+		let numExportedTabs = 0;
 
 		for (const tab of tabs) {
 			const { title, url } = tab;
@@ -56,10 +57,10 @@ const callback = (app: App, settings: PluginSettings) => async () => {
 				filePath,
 				data
 			);
-			numExported++;
+			numExportedTabs++;
 		}
 		new Notice(
-			`Exported ${numExported} browser tabs from ${browserApplicationName}`
+			`Exported ${numExportedTabs} browser tabs from ${browserApplicationName}`
 		);
 	} catch (err) {
 		console.error(err);
