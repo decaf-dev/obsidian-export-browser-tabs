@@ -5,7 +5,7 @@ import { getFrontmatterForFile } from "src/utils/frontmatter-utils";
 import { appendWebsiteTitle, findLongestString, getWebsiteTitle, removeQuotations, removeTrailingPeriod, removeWebsiteTitles, trimForObsidian } from "src/utils/title-utils";
 import { PluginSettings } from "src/types";
 import { pipeline } from "src/utils/pipeline";
-import { formatForFileSystem, trimForFileSystem } from "src/utils/file-system-utils";
+import { formatForFileSystem } from "src/utils/file-system-utils";
 import { toSentenceCase } from "src/utils/string-utils";
 
 export const exportIntoMultipleNotesCommand = (
@@ -43,6 +43,8 @@ const callback = (app: App, settings: PluginSettings) => async () => {
 
 			const filePath = `${vaultSavePath}/${fileName}`;
 			const data = getFrontmatterForFile(urlFrontmatterKey, url);
+
+			//Go through every file in the vault and make sure the url doesn't exist
 
 			await createFile(
 				app,
