@@ -33,7 +33,7 @@ const preformAction = async (app: App, plugin: ExportBrowserTabsPlugin, file: TF
 		new Notice("No URL found in frontmatter");
 		return false;
 	}
-	plugin.settings.excludedLinks.push({ url });
+	plugin.settings.excludedLinks.push(url);
 	await plugin.saveSettings();
 
 	EventManager.getInstance().emit("refresh-item-view");

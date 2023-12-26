@@ -33,7 +33,7 @@ const preformAction = async (app: App, plugin: ExportBrowserTabsPlugin, file: TF
 		return false;
 	}
 	const domain = new URL(url).hostname;
-	plugin.settings.excludedLinks.push({ url: domain });
+	plugin.settings.excludedLinks.push(domain);
 	await plugin.saveSettings();
 	EventManager.getInstance().emit("refresh-item-view");
 	new Notice(`Excluded domain: ${domain}`);

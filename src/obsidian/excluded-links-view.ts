@@ -38,13 +38,13 @@ export default class ExcludedLinksView extends ItemView {
 
 		for (const link of excludedLinks) {
 			const containerEl = contentEl.createDiv({ cls: "tree-item" });
-			const div = containerEl.createDiv({ cls: "tree-item-self is-clickable", text: link.url });
+			const div = containerEl.createDiv({ cls: "tree-item-self is-clickable", text: link });
 			div.addEventListener("contextmenu", (e) => {
 				const menu = new Menu();
 				menu.addItem((item) => {
 					item.setTitle("Remove");
 					item.onClick(async () => {
-						const index = excludedLinks.findIndex((t) => t.url === link.url);
+						const index = excludedLinks.findIndex((excluded) => excluded === link);
 						if (index > -1) {
 							excludedLinks.splice(index, 1);
 							this.plugin.settings.excludedLinks = excludedLinks;
