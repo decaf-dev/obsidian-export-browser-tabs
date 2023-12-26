@@ -34,15 +34,17 @@ const callback = (app: App, settings: PluginSettings) => async () => {
 		for (const tab of tabs) {
 			const { title, url } = tab;
 
-			if (doesUrlExist(app, url)) {
-				console.log(`URL already exists in vault: ${url}`);
-				continue;
-			}
 
 			if (excludedLinks.find(excluded => {
 				const { url: excludedUrl } = excluded;
 				return url.includes(excludedUrl)
 			})) {
+				console.log(`URL is excluded: ${url}`);
+				continue;
+			}
+
+			if (doesUrlExist(app, url)) {
+				console.log(`URL already exists in vault: ${url}`);
 				continue;
 			}
 
