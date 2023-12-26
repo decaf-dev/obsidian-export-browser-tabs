@@ -33,6 +33,9 @@ export const createFile = async (
 		await app.vault.create(normalizedFilePath, data);
 	} catch (err) {
 		if (err.message.includes("already exists")) {
+			const errorMessage = `File already exists: ${filePath}`
+			new Notice(errorMessage);
+			console.error(errorMessage);
 			return;
 		}
 		throw err;
