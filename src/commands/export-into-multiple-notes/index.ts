@@ -34,6 +34,18 @@ const callback = (app: App, settings: PluginSettings) => async () => {
 		for (const tab of tabs) {
 			const { title, url } = tab;
 
+			if (doesUrlExist(app, url)) {
+				console.log(`URL already exists in vault: ${url}`);
+				continue;
+			}
+
+			if (excludedLinks.find(excluded => {
+				const { url: excludedUrl } = excluded;
+				return url.includes(excludedUrl)
+			})) {
+				continue;
+			}
+
 			const titlePipeline = pipeline(formatForFileSystem, removeWebsiteTitles, removeTrailingHyphen, removeTrailingPeriod);
 			const titleString = (titlePipeline(title) as string).trim();
 
@@ -47,18 +59,6 @@ const callback = (app: App, settings: PluginSettings) => async () => {
 
 			const filePath = `${vaultSavePath}/${fileName}`;
 			const data = generateFrontmatter(urlFrontmatterKey, url);
-
-			if (doesUrlExist(app, url)) {
-				console.log(`URL already exists in vault: ${url}`);
-				continue;
-			}
-
-			if (excludedLinks.find(excluded => {
-				const { url: excludedUrl } = excluded;
-				return url.includes(excludedUrl)
-			})) {
-				continue;
-			}
 
 			await createFile(
 				app,
