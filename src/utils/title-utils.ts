@@ -63,3 +63,7 @@ export const trimForFileSystem = (value: string, extension: string) => {
 	const MAX_LENGTH_MAC_OS = 255;
 	return value.substring(0, MAX_LENGTH_MAC_OS - extension.length - 1);
 }
+
+export const removeTrailingPeriod = (value: string) => {
+	return value.replace(/\.$/, "");
+}
