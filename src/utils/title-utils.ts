@@ -5,6 +5,8 @@
 export const formatStringForFileSystem = (value: string) => {
 	let title = value;
 
+	// Trim whitespace
+	title = title.trim();
 	// Replace colon with hyphen
 	title = title.replace(/:/g, "-");
 	// Replace bach slash with space
@@ -21,8 +23,17 @@ export const formatStringForFileSystem = (value: string) => {
 	title = title.replace(/#/g, "");
 	// Replace pipe with nothing
 	title = title.replace(/\|/g, "");
+	//Replace double quotation mark with nothing
+	title = title.replace(/"/g, "");
+	//Replace single quotation mark with nothing
+	title = title.replace(/'/g, "");
 
-	//Only allow 255 characters
-	title = title.substring(0, 255);
+	//Replace `| text` with nothing
+	//Replace `- YouTube with nothing`
 	return title;
+}
+
+export const trimForFileSystem = (value: string, extension: string) => {
+	const MAX_LENGTH_MAC_OS = 255;
+	return value.substring(0, MAX_LENGTH_MAC_OS - extension.length - 1);
 }

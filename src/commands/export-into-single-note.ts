@@ -1,6 +1,6 @@
 import { App, Command, Notice } from "obsidian";
 import { exportBrowserTabs } from "src/export";
-import { createFile, createFolder } from "src/file-utils";
+import { createFile, createFolder } from "src/utils/file-utils";
 import { PluginSettings } from "src/types";
 
 export const exportIntoSingleNoteCommand = (app: App, settings: PluginSettings): Command => {

@@ -1,4 +1,4 @@
-import { App, normalizePath } from "obsidian";
+import { App, Notice, normalizePath } from "obsidian";
 
 /**
  * Creates a folder if it doesn't already exist
@@ -28,6 +28,13 @@ export const createFile = async (
 	filePath: string,
 	data: string
 ) => {
-	const normalizedFilePath = normalizePath(filePath);
-	await app.vault.create(normalizedFilePath, data);
+	try {
+		const normalizedFilePath = normalizePath(filePath);
+		await app.vault.create(normalizedFilePath, data);
+	} catch (err) {
+		if (err.message.includes("already exists")) {
+			return;
+		}
+		throw err;
+	}
 }
