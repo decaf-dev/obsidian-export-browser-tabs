@@ -5,11 +5,10 @@ title: Export into single note
 flowchart TD
     Start --> A
 	A[Create save folder] --> B[Get tabs using AppleScript]
-	B --> C[Iterate over tabs]
-	C --> one
-	subgraph one
-	E[Create markdown link] --> F[Append link to file data]
+	B --> one
+	subgraph one [for each tab]
+	C[Create markdown link] --> D[Add link to file data buffer]
 	end
-	F --> G[Create file with data]
-	G --> H[Push success notification]
+	D --> F[Create file with data buffer]
+	F --> G[Push success notification]
 ```
