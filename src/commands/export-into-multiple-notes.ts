@@ -2,8 +2,9 @@ import { App, Command, Notice } from "obsidian";
 import { exportBrowserTabs } from "src/export";
 import { createFile, createFolder } from "src/utils/file-utils";
 import { getFrontmatterForFile } from "src/frontmatter-utils";
-import { formatStringForFileSystem, trimForFileSystem } from "src/utils/title-utils";
+import { findLongestString, formatStringForFileSystem, removeQuotations, removeWebsiteTitles, trimForFileSystem } from "src/utils/title-utils";
 import { PluginSettings } from "src/types";
+import { pipeline } from "src/utils/pipeline";
 
 export const exportIntoMultipleNotesCommand = (
 	app: App,
@@ -27,8 +28,10 @@ const callback = (app: App, settings: PluginSettings) => async () => {
 		for (const tab of tabs) {
 			const { title, url } = tab;
 
-			const formatted = formatStringForFileSystem(title);
-			const fileName = `${formatted}.md`;
+			const titlePipeline = pipeline(formatStringForFileSystem, removeQuotations, removeWebsiteTitles, findLongestString);
+			const titleString = titlePipeline(title);
+
+			const fileName = `${titleString}.md`;
 			const trimmed = trimForFileSystem(fileName, "md");
 
 			const filePath = `${vaultSavePath}/${trimmed}`;
