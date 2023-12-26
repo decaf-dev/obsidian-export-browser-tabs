@@ -38,3 +38,8 @@ export const findLongestString = (value: string) => {
 	}
 	return title;
 }
+
+export const trimForObsidian = (value: string, extension: string) => {
+	const MAX_LENGTH = 150;
+	return value.substring(0, MAX_LENGTH - extension.length - 1);
+}
