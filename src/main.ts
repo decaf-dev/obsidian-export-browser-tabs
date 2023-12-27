@@ -8,10 +8,12 @@ import ExcludedTabsView from "./obsidian/excluded-links-view";
 import { showExcludedLinksCommand } from "./commands/show-excluded-tabs";
 import { excludeUrlCommand } from "./commands/exclude-url";
 import { excludeDomainCommand } from "./commands/exclude-domain";
+import { exportIntoMultipleNotesRemoteCommand } from "./commands/export-into-multiple-notes-remote";
 
 const DEFAULT_SETTINGS: PluginSettings = {
 	vaultSavePath: "",
-	browserApplicationName: "",
+	localBrowserAppName: "",
+	remoteBrowserAppName: "",
 	fileName: "Browser tabs",
 	urlFrontmatterKey: "url",
 	appendWebsiteType: false,
@@ -35,6 +37,7 @@ export default class ExportBrowserTabsPlugin extends Plugin {
 		// Register commands
 		this.addCommand(exportIntoSingleNoteCommand(this.app, this.settings));
 		this.addCommand(exportIntoMultipleNotesCommand(this.app, this.settings));
+		this.addCommand(exportIntoMultipleNotesRemoteCommand(this.app, this.settings));
 		this.addCommand(showExcludedLinksCommand(this.app));
 		this.addCommand(excludeUrlCommand(this.app, this));
 		this.addCommand(excludeDomainCommand(this.app, this));

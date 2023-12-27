@@ -7,27 +7,24 @@ import { pipeline } from "src/utils/pipeline";
 import { formatForFileSystem } from "src/utils/file-system-utils";
 import { toSentenceCase } from "src/utils/string-utils";
 import { doesUrlExist } from "src/utils/vault";
-import { exportLocalTabs } from "src/export/local-export";
+import { exportRemoteTabs } from "src/export/remote-export";
 
-export const exportIntoMultipleNotesCommand = (
-	app: App,
-	settings: PluginSettings
-): Command => {
+export const exportIntoMultipleNotesRemoteCommand = (app: App, settings: PluginSettings): Command => {
 	return {
-		id: "export-into-multiple-notes",
-		name: "Export into multiple notes",
+		id: "export-into-multiple-notes-remote",
+		name: "Export into multiple notes (remote)",
 		callback: callback(app, settings),
-	};
-};
+	}
+}
 
 const callback = (app: App, settings: PluginSettings) => async () => {
-	const { vaultSavePath, localBrowserAppName, urlFrontmatterKey, excludedLinks } = settings;
+	const { vaultSavePath, remoteBrowserAppName, urlFrontmatterKey, excludedLinks } = settings;
 	try {
 		await createFolder(app, vaultSavePath);
-		const tabs = await exportLocalTabs(
-			localBrowserAppName
+		const tabs = await exportRemoteTabs(
+			remoteBrowserAppName
 		);
-		console.log(`Found ${tabs.length} browser tabs`);
+		console.log(`Found ${tabs.length} remote browser tabs`);
 
 		let numExportedTabs = 0;
 
@@ -70,7 +67,7 @@ const callback = (app: App, settings: PluginSettings) => async () => {
 				numExportedTabs++;
 		}
 		new Notice(
-			`Exported ${numExportedTabs} browser tabs from ${localBrowserAppName}`
+			`Exported ${numExportedTabs} remote browser tabs from ${remoteBrowserAppName}`
 		);
 	} catch (err) {
 		console.error(err);
