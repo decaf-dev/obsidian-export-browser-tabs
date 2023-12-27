@@ -56,12 +56,18 @@ export const createFileByParts = async (
 	try {
 		const normalizedFilePath = normalizePath(filePath);
 		await app.vault.create(normalizedFilePath, data);
+		return true;
 	} catch (err) {
 		if (err.message.includes("already exists")) {
-			console.log("File already exists in vault:", filePath);
-			const newFilePath = `${savePath}/Tab conflict ${Date.now()}.${extension}`;
-			createFile(app, newFilePath, data);
-			return;
+			// console.log("File already exists in vault:", filePath);
+			const newFilePath = `${savePath}/Tab conflict ${crypto.randomUUID()}.${extension}`;
+			try {
+				await createFile(app, newFilePath, data);
+			} catch (err) {
+				console.error(err);
+				new Notice(`Error creating file: ${err.message}`);
+			}
+			return false;
 		}
 		throw err;
 	}
