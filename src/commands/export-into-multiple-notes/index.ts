@@ -61,13 +61,12 @@ const callback = (app: App, settings: PluginSettings) => async () => {
 			const filePath = `${vaultSavePath}/${fileName}`;
 			const data = generateFrontmatter(urlFrontmatterKey, url);
 
-			const result = await createFile(
+			await createFile(
 				app,
 				filePath,
 				data
 			);
-			if (result)
-				numExportedTabs++;
+			numExportedTabs++;
 		}
 		new Notice(
 			`Exported ${numExportedTabs} browser tabs from ${localBrowserAppName}`

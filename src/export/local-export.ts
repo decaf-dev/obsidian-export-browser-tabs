@@ -3,10 +3,10 @@ import { promisify } from "util";
 
 const exec = promisify(execCallback);
 
-export const exportLocalTabs = async (browserApplicationName: string) => {
+export const exportLocalTabs = async (browserApplicationName: string): Promise<BrowserTab[]> => {
 	if (browserApplicationName === "") {
 		throw new Error(
-			"No browser application name specified. Please set one in the plugin settings."
+			"No local browser application name specified. Please set one in the plugin settings."
 		);
 	}
 
@@ -35,18 +35,22 @@ export const exportLocalTabs = async (browserApplicationName: string) => {
 			end tell
 		`;
 
-	const { stdout, stderr } = await exec(`osascript -e '${appleScript}'`);
-	if (stderr) {
-		throw new Error(stderr);
+	try {
+		const { stdout, stderr } = await exec(`osascript -e '${appleScript}'`);
+		if (stderr) {
+			throw new Error(stderr);
+		}
+		const tabs: BrowserTab[] = stdout
+			.trim()
+			.split("\n")
+			.map((entry) => {
+				// Split the entry by the first occurrence of "|"
+				const [url, ...titleParts] = entry.split("|");
+				const title = titleParts.join("|"); // Rejoin the title in case it contains "|"
+				return { url, title };
+			});
+		return tabs;
+	} catch (err) {
+		throw err;
 	}
-	const tabs = stdout
-		.trim()
-		.split("\n")
-		.map((entry) => {
-			// Split the entry by the first occurrence of "|"
-			const [url, ...titleParts] = entry.split("|");
-			const title = titleParts.join("|"); // Rejoin the title in case it contains "|"
-			return { url, title };
-		});
-	return tabs;
 }

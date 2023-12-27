@@ -3,48 +3,56 @@ import { promisify } from "util";
 
 const exec = promisify(execCallback);
 
-export const exportRemoteTabs = async (browserApplicationName: string) => {
+export const exportRemoteTabs = async (browserApplicationName: string, adbPath: string): Promise<BrowserTab[]> => {
 	if (browserApplicationName === "") {
 		throw new Error(
-			"No browser application name specified. Please set one in the plugin settings."
+			"No remote browser application name specified. Please set one in the plugin settings."
 		);
 	}
 
+	if (adbPath === "") {
+		throw new Error(
+			"No ADB path specified. Please set one in the plugin settings."
+		);
+	}
+
+	//forwarding will output 9222 so we need to redirect that to /dev/null
 	let command = `
-		if ! command -v adb &> /dev/null
+		if ! command -v "${adbPath}" &> /dev/null
 		then
-			echo "adb could not be found, please install it and run this script again."
+			echo "${adbPath} could not be found, please install it and run this script again."
 			exit
 		fi
 
-		adb forward tcp:9222 localabstract:chrome_devtools_remote
-
-		curl http://localhost:9222/json/list
-
-		adb forward --remove tcp:9222
+		${adbPath} forward tcp:9222 localabstract:chrome_devtools_remote >/dev/null
+		curl -s http://localhost:9222/json/list
+		${adbPath} forward --remove tcp:9222
 	`;
 
-	const { stdout, stderr } = await exec(command);
-	if (stderr) {
-		throw new Error(stderr);
+
+	try {
+		const MAX_BUFFER_SIZE = 1024 * 1024 * 10;
+		const { stdout, stderr } = await exec(command, { maxBuffer: MAX_BUFFER_SIZE });
+		if (stderr) {
+			throw new Error(stderr);
+		}
+
+		const arr = JSON.parse(stdout);
+		const tabs: BrowserTab[] = arr.map((entry: unknown) => {
+			const { url, title } = entry as {
+				title: string, url: string
+			}
+			return {
+				url,
+				title
+			}
+		});
+		return tabs;
+	} catch (err: unknown) {
+		const error = err as Error;
+		if (error.message.includes("no devices/emulators found")) {
+			throw new Error("No devices found. Please connect a device and try again.");
+		}
+		throw err;
 	}
-
-	const tabs: {
-		url: string;
-		title: string;
-	}[] = [];
-	console.log(stdout);
-	return tabs;
-	// const tabs = stdout
-	// const tabs = stdout
-	// 	.split("\n")
-	// 	.map((entry) => {
-	// 		// Split the entry by the first occurrence of "|"
-	// 		const [url, ...titleParts] = entry.split("|");
-	// 		const title = titleParts.join("|"); // Rejoin the title in case it contains "|"
-	// 		return { url, title };
-	// 	});
-
-	// //console.log("Tabs", tabs);
-	// return tabs;
 }

@@ -1,11 +1,11 @@
 import { App, Command, Notice } from "obsidian";
-import { createFile, createFolder } from "src/utils/file-utils";
+import { createFileByParts, createFolder } from "src/utils/file-utils";
 import { generateFrontmatter } from "src/utils/frontmatter-utils";
 import { appendWebsiteTitle, getWebsiteTitle, removeTrailingHyphen, removeTrailingPeriod, removeWebsiteTitles, trimForObsidian } from "src/utils/title-utils";
 import { PluginSettings } from "src/types";
 import { pipeline } from "src/utils/pipeline";
 import { formatForFileSystem } from "src/utils/file-system-utils";
-import { toSentenceCase } from "src/utils/string-utils";
+import { decodeHtmlEntities, toSentenceCase } from "src/utils/string-utils";
 import { doesUrlExist } from "src/utils/vault";
 import { exportRemoteTabs } from "src/export/remote-export";
 
@@ -18,15 +18,18 @@ export const exportIntoMultipleNotesRemoteCommand = (app: App, settings: PluginS
 }
 
 const callback = (app: App, settings: PluginSettings) => async () => {
-	const { vaultSavePath, remoteBrowserAppName, urlFrontmatterKey, excludedLinks } = settings;
+	const { vaultSavePath, remoteBrowserAppName, urlFrontmatterKey, excludedLinks, adbPath } = settings;
 	try {
 		await createFolder(app, vaultSavePath);
 		const tabs = await exportRemoteTabs(
-			remoteBrowserAppName
+			remoteBrowserAppName,
+			adbPath
 		);
 		console.log(`Found ${tabs.length} remote browser tabs`);
 
 		let numExportedTabs = 0;
+		let numExcludedTabs = 0;
+		let numAlreadyExistingTabs = 0;
 
 		for (const tab of tabs) {
 			const { title, url } = tab;
@@ -36,15 +39,17 @@ const callback = (app: App, settings: PluginSettings) => async () => {
 				return url.includes(link)
 			})) {
 				console.log(`URL is excluded: ${url}`);
+				numExcludedTabs++;
 				continue;
 			}
 
 			if (doesUrlExist(app, url)) {
 				console.log(`URL already exists in vault: ${url}`);
+				numAlreadyExistingTabs++;
 				continue;
 			}
 
-			const titlePipeline = pipeline(formatForFileSystem, removeWebsiteTitles, removeTrailingHyphen, removeTrailingPeriod);
+			const titlePipeline = pipeline(decodeHtmlEntities, formatForFileSystem, removeWebsiteTitles, removeTrailingHyphen, removeTrailingPeriod);
 			const titleString = (titlePipeline(title) as string).trim();
 
 			const websiteTitle = getWebsiteTitle(url);
@@ -53,22 +58,23 @@ const callback = (app: App, settings: PluginSettings) => async () => {
 			const sentenceCase = toSentenceCase(trimmed);
 			const titleWithWebsite = appendWebsiteTitle(sentenceCase, websiteTitle);
 
-			const fileName = `${titleWithWebsite}.md`;
-
-			const filePath = `${vaultSavePath}/${fileName}`;
 			const data = generateFrontmatter(urlFrontmatterKey, url);
 
-			const result = await createFile(
+			await createFileByParts(
 				app,
-				filePath,
+				vaultSavePath,
+				titleWithWebsite,
+				"md",
 				data
 			);
-			if (result)
-				numExportedTabs++;
+			numExportedTabs++;
 		}
 		new Notice(
 			`Exported ${numExportedTabs} remote browser tabs from ${remoteBrowserAppName}`
 		);
+		console.log(`Exported ${numExportedTabs} remote browser tabs`);
+		console.log(`Excluded ${numExcludedTabs} remote browser tabs`);
+		console.log(`Skipped ${numAlreadyExistingTabs} remote browser tabs`);
 	} catch (err) {
 		console.error(err);
 		new Notice(`Error exporting browser tabs: ${err.message} `);
