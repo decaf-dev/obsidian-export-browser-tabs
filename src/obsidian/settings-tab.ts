@@ -24,15 +24,29 @@ export default class SettingsTab extends PluginSettingTab {
 		new Setting(containerEl).setHeading().setName("General");
 
 		new Setting(containerEl)
-			.setName("Browser application name")
+			.setName("Local browser application name")
 			.setDesc(
-				"The name of the browser application to export tabs from. This will be used in AppleScript commands."
+				"The name of the browser application to export tabs from. e.g. brave or chrome"
 			)
 			.addText((text) =>
 				text
-					.setValue(this.plugin.settings.browserApplicationName)
+					.setValue(this.plugin.settings.localBrowserAppName)
 					.onChange(async (value) => {
-						this.plugin.settings.browserApplicationName = value;
+						this.plugin.settings.localBrowserAppName = value;
+						await this.plugin.saveSettings();
+					})
+			);
+
+		new Setting(containerEl)
+			.setName("Remote browser application name")
+			.setDesc(
+				"The name of the remote browser application to export tabs from. e.g. brave or chrome"
+			)
+			.addText((text) =>
+				text
+					.setValue(this.plugin.settings.remoteBrowserAppName)
+					.onChange(async (value) => {
+						this.plugin.settings.remoteBrowserAppName = value;
 						await this.plugin.saveSettings();
 					})
 			);
