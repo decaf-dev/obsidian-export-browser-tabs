@@ -18,6 +18,7 @@ const DEFAULT_SETTINGS: PluginSettings = {
 	urlFrontmatterKey: "url",
 	appendWebsiteType: false,
 	excludedLinks: [],
+	adbPath: "",
 };
 
 export default class ExportBrowserTabsPlugin extends Plugin {

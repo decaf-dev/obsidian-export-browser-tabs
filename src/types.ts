@@ -6,4 +6,5 @@ export interface PluginSettings {
 	excludedLinks: string[];
 	localBrowserAppName: string;
 	remoteBrowserAppName: string;
+	adbPath: string;
 }

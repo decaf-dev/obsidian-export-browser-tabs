@@ -15,6 +15,7 @@ export default class SettingsTab extends PluginSettingTab {
 		containerEl.empty();
 
 		this.renderGeneralSettings(containerEl);
+		this.renderRemoteSettings(containerEl);
 		this.addSingleNoteSettings(containerEl);
 		this.renderMultipleNoteSettings(containerEl);
 
@@ -112,6 +113,24 @@ export default class SettingsTab extends PluginSettingTab {
 					.setValue(this.plugin.settings.appendWebsiteType)
 					.onChange(async (value) => {
 						this.plugin.settings.appendWebsiteType = value;
+						await this.plugin.saveSettings();
+					})
+			);
+	}
+
+	renderRemoteSettings(containerEl: HTMLElement): void {
+		new Setting(containerEl).setHeading().setName("Remote");
+
+		new Setting(containerEl)
+			.setName("ADB path")
+			.setDesc(
+				"The absolute path to the ADB executable on your machine. This can be found by running 'which adb' in your terminal."
+			)
+			.addText((text) =>
+				text
+					.setValue(this.plugin.settings.adbPath)
+					.onChange(async (value) => {
+						this.plugin.settings.adbPath = value;
 						await this.plugin.saveSettings();
 					})
 			);
