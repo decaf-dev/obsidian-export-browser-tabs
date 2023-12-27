@@ -32,12 +32,14 @@ const callback = (app: App, settings: PluginSettings) => async () => {
 		let numAlreadyExistingTabs = 0;
 		let numEmptyTabs = 0;
 		let numTabConflicts = 0;
+		let numSkipped = 0;
 
 		for (const tab of tabs) {
 			const { title, url } = tab;
 
 			if (url === "") {
 				numEmptyTabs++;
+				numSkipped++;
 				continue;
 			}
 
@@ -46,12 +48,14 @@ const callback = (app: App, settings: PluginSettings) => async () => {
 			})) {
 				// console.log(`URL is excluded: ${url}`);
 				numExcludedTabs++;
+				numSkipped++;
 				continue;
 			}
 
 			if (doesUrlExist(app, url)) {
 				// console.log(`URL already exists in vault: ${url}`);
 				numAlreadyExistingTabs++;
+				numSkipped++;
 				continue;
 			}
 
@@ -81,11 +85,16 @@ const callback = (app: App, settings: PluginSettings) => async () => {
 		new Notice(
 			`Exported ${numExportedTabs} remote browser tabs from ${remoteBrowserAppName}`
 		);
+		console.log("-----");
 		console.log(`Empty url: ${numEmptyTabs}`);
 		console.log(`Excluded: ${numExcludedTabs}`);
-		console.log(`Already existing urls: ${numAlreadyExistingTabs}`);
-		console.log(`Conflicts: ${numTabConflicts}`);
+		console.log(`Already existing url: ${numAlreadyExistingTabs}`);
+		console.log(`Title conflict: ${numTabConflicts}`);
+		console.log("-----");
+		console.log(`Skipped: ${numSkipped}`);
 		console.log(`Exported: ${numExportedTabs}`);
+		console.log("-----");
+		console.log("");
 	} catch (err) {
 		console.error(err);
 		new Notice(`Error exporting browser tabs: ${err.message} `);
