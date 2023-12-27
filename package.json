@@ -1,6 +1,6 @@
 {
 	"name": "obsidian-export-browser-tabs",
-	"version": "0.4.1",
+	"version": "0.5.0",
 	"description": "Export your open browser tabs using AppleScript",
 	"main": "main.js",
 	"scripts": {
