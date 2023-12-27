@@ -30,21 +30,27 @@ const callback = (app: App, settings: PluginSettings) => async () => {
 		let numExportedTabs = 0;
 		let numExcludedTabs = 0;
 		let numAlreadyExistingTabs = 0;
+		let numEmptyTabs = 0;
+		let numTabConflicts = 0;
 
 		for (const tab of tabs) {
 			const { title, url } = tab;
 
+			if (url === "") {
+				numEmptyTabs++;
+				continue;
+			}
 
 			if (excludedLinks.find(link => {
 				return url.includes(link)
 			})) {
-				console.log(`URL is excluded: ${url}`);
+				// console.log(`URL is excluded: ${url}`);
 				numExcludedTabs++;
 				continue;
 			}
 
 			if (doesUrlExist(app, url)) {
-				console.log(`URL already exists in vault: ${url}`);
+				// console.log(`URL already exists in vault: ${url}`);
 				numAlreadyExistingTabs++;
 				continue;
 			}
@@ -60,21 +66,26 @@ const callback = (app: App, settings: PluginSettings) => async () => {
 
 			const data = generateFrontmatter(urlFrontmatterKey, url);
 
-			await createFileByParts(
+			const result = await createFileByParts(
 				app,
 				vaultSavePath,
 				titleWithWebsite,
 				"md",
 				data
 			);
+			if (!result) {
+				numTabConflicts++;
+			}
 			numExportedTabs++;
 		}
 		new Notice(
 			`Exported ${numExportedTabs} remote browser tabs from ${remoteBrowserAppName}`
 		);
-		console.log(`Exported ${numExportedTabs} remote browser tabs`);
-		console.log(`Excluded ${numExcludedTabs} remote browser tabs`);
-		console.log(`Skipped ${numAlreadyExistingTabs} remote browser tabs`);
+		console.log(`Empty url: ${numEmptyTabs}`);
+		console.log(`Excluded: ${numExcludedTabs}`);
+		console.log(`Already existing urls: ${numAlreadyExistingTabs}`);
+		console.log(`Conflicts: ${numTabConflicts}`);
+		console.log(`Exported: ${numExportedTabs}`);
 	} catch (err) {
 		console.error(err);
 		new Notice(`Error exporting browser tabs: ${err.message} `);
