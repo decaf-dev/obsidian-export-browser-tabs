@@ -1,7 +1,7 @@
 import { App, Command, Notice } from "obsidian";
-import { exportBrowserTabs } from "src/export/export";
 import { createFile, createFolder } from "src/utils/file-utils";
 import { PluginSettings } from "src/types";
+import { exportLocalTabs } from "src/export/local-export";
 
 export const exportIntoSingleNoteCommand = (app: App, settings: PluginSettings): Command => {
 	return {
@@ -12,11 +12,11 @@ export const exportIntoSingleNoteCommand = (app: App, settings: PluginSettings):
 };
 
 const callback = (app: App, settings: PluginSettings) => async () => {
-	const { vaultSavePath, browserApplicationName, fileName } = settings;
+	const { vaultSavePath, localBrowserAppName, fileName } = settings;
 	try {
 		await createFolder(app, vaultSavePath);
-		const tabs = await exportBrowserTabs(
-			browserApplicationName
+		const tabs = await exportLocalTabs(
+			localBrowserAppName
 		);
 		const markdownLinks = tabs.map((tab) => `[${tab.title}](${tab.url})`);
 
@@ -27,7 +27,7 @@ const callback = (app: App, settings: PluginSettings) => async () => {
 			markdownLinks.join("\n\n")
 		);
 		new Notice(
-			`Exported ${tabs.length} browser tabs from ${browserApplicationName}`
+			`Exported ${tabs.length} browser tabs from ${localBrowserAppName}`
 		);
 	} catch (err) {
 		console.error(err);
