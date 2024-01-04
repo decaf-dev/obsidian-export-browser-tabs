@@ -79,3 +79,7 @@ export const getWebsiteTitle = (url: string) => {
 export const appendWebsiteTitle = (value: string, websiteTitle: string) => {
 	return `${value} (${websiteTitle})`;
 }
+
+export const removeNotificationCount = (value: string) => {
+	return value.replace(/^\(\d\)/, "").trim();
+}

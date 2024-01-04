@@ -1,7 +1,7 @@
 import { App, Command, Notice } from "obsidian";
 import { createFileByParts, createFolder } from "src/utils/file-utils";
 import { generateFrontmatter } from "src/utils/frontmatter-utils";
-import { appendWebsiteTitle, getWebsiteTitle, removeTrailingHyphen, removeTrailingPeriod, removeWebsiteTitles, trimForObsidian } from "src/utils/title-utils";
+import { appendWebsiteTitle, getWebsiteTitle, removeNotificationCount, removeTrailingHyphen, removeTrailingPeriod, removeWebsiteTitles, trimForObsidian } from "src/utils/title-utils";
 import { PluginSettings } from "src/types";
 import { pipeline } from "src/utils/pipeline";
 import { formatForFileSystem } from "src/utils/file-system-utils";
@@ -59,7 +59,7 @@ const callback = (app: App, settings: PluginSettings) => async () => {
 				continue;
 			}
 
-			const titlePipeline = pipeline(decodeHtmlEntities, formatForFileSystem, removeWebsiteTitles, removeTrailingHyphen, removeTrailingPeriod);
+			const titlePipeline = pipeline(decodeHtmlEntities, formatForFileSystem, removeWebsiteTitles, removeTrailingHyphen, removeTrailingPeriod, removeNotificationCount);
 			const titleString = (titlePipeline(title) as string).trim();
 
 			const websiteTitle = getWebsiteTitle(url);

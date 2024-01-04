@@ -12,9 +12,10 @@ flowchart TD
 	E --> F[Remove website title]
 	F --> G[Remove trailing hyphen]
 	G --> H[Remove trailing period]
-	H --> I[Trim up 150 characters]
-	I --> J[Convert to sentence case]
-	J --> L[Append website title in parenthesis]
+	H --> I["Remove notification count '(1)'"]
+	I --> J[Trim up 150 characters]
+	J --> K[Convert to sentence case]
+	K --> L[Append website title in parenthesis]
 	L --> M[Get frontmatter for file]
 	M --> N[Create file with frontmatter data]
 
