@@ -15,6 +15,8 @@ export const removeTrailingPeriod = (value: string) => {
  * @param value - The title to format
  */
 export const removeWebsiteTitles = (value: string) => {
+	console.log(value);
+	value = value.replace(/on X-/, "-");
 	value = value.replace(/YouTube$/, "");
 	value = value.replace(/Search X$/, "");
 	value = value.replace(/Wikipedia$/, "");
