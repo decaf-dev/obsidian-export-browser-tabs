@@ -84,6 +84,20 @@ export default class SettingsTab extends PluginSettingTab {
 						await this.plugin.saveSettings();
 					})
 			);
+
+		new Setting(containerEl)
+			.setName("Export title and url")
+			.setDesc(
+				"If true, both the title and URL of the tab will be exported. If false, only the URL will be exported."
+			)
+			.addToggle((text) =>
+				text
+					.setValue(this.plugin.settings.exportTitleAndUrl)
+					.onChange(async (value) => {
+						this.plugin.settings.exportTitleAndUrl = value;
+						await this.plugin.saveSettings();
+					})
+			);
 	}
 
 	renderMultipleNoteSettings(containerEl: HTMLElement): void {
@@ -99,20 +113,6 @@ export default class SettingsTab extends PluginSettingTab {
 					.setValue(this.plugin.settings.urlFrontmatterKey)
 					.onChange(async (value) => {
 						this.plugin.settings.urlFrontmatterKey = value;
-						await this.plugin.saveSettings();
-					})
-			);
-
-		new Setting(containerEl)
-			.setName("Append website type")
-			.setDesc(
-				"Appends a website type to the end of the title. For example, if the website includes 'YouTube', (YouTube) will be appended to the end of the title."
-			)
-			.addToggle((text) =>
-				text
-					.setValue(this.plugin.settings.appendWebsiteType)
-					.onChange(async (value) => {
-						this.plugin.settings.appendWebsiteType = value;
 						await this.plugin.saveSettings();
 					})
 			);
