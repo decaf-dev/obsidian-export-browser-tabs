@@ -1,11 +1,11 @@
 import { App, Command, Notice } from "obsidian";
 import { createFileByParts, createFolder } from "src/utils/file-utils";
 import { generateFrontmatter } from "src/utils/frontmatter-utils";
-import { appendWebsiteTitle, getWebsiteTitle, removeNotificationCount, removeTrailingHyphen, removeTrailingPeriod, removeWebsiteTitles, trimForObsidian } from "src/utils/title-utils";
+import { removeNotificationCount, trimForFileSystem } from "src/utils/title-utils";
 import { PluginSettings } from "src/types";
 import { pipeline } from "src/utils/pipeline";
 import { formatForFileSystem } from "src/utils/file-system-utils";
-import { decodeHtmlEntities, toSentenceCase } from "src/utils/string-utils";
+import { decodeHtmlEntities } from "src/utils/string-utils";
 import { doesUrlExist } from "src/utils/vault";
 import { exportRemoteTabs } from "src/export/remote-export";
 
@@ -28,73 +28,41 @@ const callback = (app: App, settings: PluginSettings) => async () => {
 		console.log(`Found ${tabs.length} remote browser tabs`);
 
 		let numExportedTabs = 0;
-		let numExcludedTabs = 0;
-		let numAlreadyExistingTabs = 0;
-		let numEmptyTabs = 0;
-		let numTabConflicts = 0;
-		let numSkipped = 0;
 
 		for (const tab of tabs) {
 			const { title, url } = tab;
 
-			if (url === "") {
-				numEmptyTabs++;
-				numSkipped++;
-				continue;
-			}
-
-			if (excludedLinks.find(link => {
-				return url.includes(link)
-			})) {
-				// console.log(`URL is excluded: ${url}`);
-				numExcludedTabs++;
-				numSkipped++;
+			if (excludedLinks.find(link =>
+				url.includes(link)
+			)) {
+				console.log(`URL is excluded: ${url}`);
 				continue;
 			}
 
 			if (doesUrlExist(app, url)) {
-				// console.log(`URL already exists in vault: ${url}`);
-				numAlreadyExistingTabs++;
-				numSkipped++;
+				console.log(`URL already exists in vault: ${url}`);
 				continue;
 			}
 
-			const titlePipeline = pipeline(decodeHtmlEntities, formatForFileSystem, removeWebsiteTitles, removeTrailingHyphen, removeTrailingPeriod, removeNotificationCount);
-			const titleString = (titlePipeline(title) as string).trim();
 
-			const websiteTitle = getWebsiteTitle(url);
-			const trimmed = trimForObsidian(titleString as string, websiteTitle, "md");
-
-			const sentenceCase = toSentenceCase(trimmed);
-			const titleWithWebsite = appendWebsiteTitle(sentenceCase, websiteTitle);
-
+			const titlePipeline = pipeline(decodeHtmlEntities, formatForFileSystem, removeNotificationCount);
+			const formattedTitle = titlePipeline(title) as string;
+			const trimmedTitle = trimForFileSystem(formattedTitle, ".md");
 			const data = generateFrontmatter(urlFrontmatterKey, url);
 
-			const result = await createFileByParts(
+			await createFileByParts(
 				app,
 				vaultSavePath,
-				titleWithWebsite,
+				trimmedTitle,
 				"md",
 				data
 			);
-			if (!result) {
-				numTabConflicts++;
-			}
 			numExportedTabs++;
 		}
 		new Notice(
 			`Exported ${numExportedTabs} remote browser tabs from ${remoteBrowserAppName}`
 		);
-		console.log("-----");
-		console.log(`Empty url: ${numEmptyTabs}`);
-		console.log(`Excluded: ${numExcludedTabs}`);
-		console.log(`Already existing url: ${numAlreadyExistingTabs}`);
-		console.log(`Title conflict: ${numTabConflicts}`);
-		console.log("-----");
-		console.log(`Skipped: ${numSkipped}`);
-		console.log(`Exported: ${numExportedTabs}`);
-		console.log("-----");
-		console.log("");
+		console.log(`Exported ${numExportedTabs} remote browser tabs from ${remoteBrowserAppName}`);
 	} catch (err) {
 		console.error(err);
 		new Notice(`Error exporting browser tabs: ${err.message} `);

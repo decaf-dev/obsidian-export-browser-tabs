@@ -12,13 +12,30 @@ export const exportIntoSingleNoteCommand = (app: App, settings: PluginSettings):
 };
 
 const callback = (app: App, settings: PluginSettings) => async () => {
-	const { vaultSavePath, localBrowserAppName, fileName } = settings;
+	const { vaultSavePath, localBrowserAppName, fileName, exportTitleAndUrl, excludedLinks } = settings;
 	try {
 		await createFolder(app, vaultSavePath);
 		const tabs = await exportLocalTabs(
 			localBrowserAppName
 		);
-		const markdownLinks = tabs.map((tab) => `[${tab.title}](${tab.url})`);
+
+		const filteredTabs = tabs.filter((tab) => {
+			const { url } = tab;
+			if (excludedLinks.find(link =>
+				url.includes(link)
+			)) {
+				return false;
+			}
+			return true;
+		});
+
+		const markdownLinks = filteredTabs.map((tab) => {
+			const { title, url } = tab;
+			if (exportTitleAndUrl) {
+				return `[${title}](${url})`;
+			}
+			return url;
+		});
 
 		const filePath = `${vaultSavePath}/${fileName} ${Date.now()}.md`;
 		await createFile(
@@ -29,6 +46,7 @@ const callback = (app: App, settings: PluginSettings) => async () => {
 		new Notice(
 			`Exported ${tabs.length} browser tabs from ${localBrowserAppName}`
 		);
+		console.log(`Exported ${tabs.length} browser tabs from ${localBrowserAppName}`);
 	} catch (err) {
 		console.error(err);
 		new Notice(`Error exporting browser tabs: ${err.message}`);

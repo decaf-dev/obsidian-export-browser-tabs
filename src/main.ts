@@ -16,7 +16,7 @@ const DEFAULT_SETTINGS: PluginSettings = {
 	remoteBrowserAppName: "",
 	fileName: "Browser tabs",
 	urlFrontmatterKey: "url",
-	appendWebsiteType: false,
+	exportTitleAndUrl: true,
 	excludedLinks: [],
 	adbPath: "",
 };

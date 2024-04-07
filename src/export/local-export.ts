@@ -1,6 +1,8 @@
 import { exec as execCallback } from "child_process";
 import { promisify } from "util";
 import { BrowserTab } from "./types";
+import { getEmptyTabTitle } from "src/utils/title-utils";
+import { filterDuplicateTabs } from "./utils";
 
 const exec = promisify(execCallback);
 
@@ -47,10 +49,16 @@ export const exportLocalTabs = async (browserApplicationName: string): Promise<B
 			.map((entry) => {
 				// Split the entry by the first occurrence of "|"
 				const [url, ...titleParts] = entry.split("|");
-				const title = titleParts.join("|"); // Rejoin the title in case it contains "|"
+				let title = titleParts.join("|"); // Rejoin the title in case it contains "|"
+
+				//It's possible that the title is empty if the tab has not loaded yet
+				if (title.trim() === "")
+					title = getEmptyTabTitle();
+
 				return { url, title };
 			});
-		return tabs;
+		const filteredTabs = filterDuplicateTabs(tabs);
+		return filteredTabs;
 	} catch (err) {
 		throw err;
 	}
