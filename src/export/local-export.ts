@@ -47,7 +47,12 @@ export const exportLocalTabs = async (browserApplicationName: string): Promise<B
 			.map((entry) => {
 				// Split the entry by the first occurrence of "|"
 				const [url, ...titleParts] = entry.split("|");
-				const title = titleParts.join("|"); // Rejoin the title in case it contains "|"
+				let title = titleParts.join("|"); // Rejoin the title in case it contains "|"
+
+				//It's possible that the title is empty if the tab has not loaded yet
+				if (title.trim() === "") {
+					title = `Untitled tab ${crypto.randomUUID()}`;
+				}
 				return { url, title };
 			});
 		return tabs;
