@@ -29,6 +29,7 @@ const callback = (app: App, settings: PluginSettings) => async () => {
 		new Notice(
 			`Exported ${tabs.length} browser tabs from ${localBrowserAppName}`
 		);
+		console.log(`Exported ${tabs.length} browser tabs from ${localBrowserAppName}`);
 	} catch (err) {
 		console.error(err);
 		new Notice(`Error exporting browser tabs: ${err.message}`);

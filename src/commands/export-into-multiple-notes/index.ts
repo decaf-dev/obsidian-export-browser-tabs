@@ -33,9 +33,9 @@ const callback = (app: App, settings: PluginSettings) => async () => {
 		for (const tab of tabs) {
 			const { title, url } = tab;
 
-			if (excludedLinks.find(link => {
-				return url.includes(link)
-			})) {
+			if (excludedLinks.find(link =>
+				url.includes(link)
+			)) {
 				console.log(`URL is excluded: ${url}`);
 				continue;
 			}

@@ -28,67 +28,41 @@ const callback = (app: App, settings: PluginSettings) => async () => {
 		console.log(`Found ${tabs.length} remote browser tabs`);
 
 		let numExportedTabs = 0;
-		let numExcludedTabs = 0;
-		let numAlreadyExistingTabs = 0;
-		let numEmptyTabs = 0;
-		let numTabConflicts = 0;
-		let numSkipped = 0;
 
 		for (const tab of tabs) {
 			const { title, url } = tab;
 
-			if (url === "") {
-				numEmptyTabs++;
-				numSkipped++;
-				continue;
-			}
-
-			if (excludedLinks.find(link => {
-				return url.includes(link)
-			})) {
-				// console.log(`URL is excluded: ${url}`);
-				numExcludedTabs++;
-				numSkipped++;
+			if (excludedLinks.find(link =>
+				url.includes(link)
+			)) {
+				console.log(`URL is excluded: ${url}`);
 				continue;
 			}
 
 			if (doesUrlExist(app, url)) {
-				// console.log(`URL already exists in vault: ${url}`);
-				numAlreadyExistingTabs++;
-				numSkipped++;
+				console.log(`URL already exists in vault: ${url}`);
 				continue;
 			}
+
 
 			const titlePipeline = pipeline(decodeHtmlEntities, formatForFileSystem, removeNotificationCount);
 			const formattedTitle = titlePipeline(title) as string;
 			const trimmedTitle = trimForFileSystem(formattedTitle, ".md");
 			const data = generateFrontmatter(urlFrontmatterKey, url);
 
-			const result = await createFileByParts(
+			await createFileByParts(
 				app,
 				vaultSavePath,
 				trimmedTitle,
 				"md",
 				data
 			);
-			if (!result) {
-				numTabConflicts++;
-			}
 			numExportedTabs++;
 		}
 		new Notice(
 			`Exported ${numExportedTabs} remote browser tabs from ${remoteBrowserAppName}`
 		);
-		console.log("-----");
-		console.log(`Empty url: ${numEmptyTabs}`);
-		console.log(`Excluded: ${numExcludedTabs}`);
-		console.log(`Already existing url: ${numAlreadyExistingTabs}`);
-		console.log(`Title conflict: ${numTabConflicts}`);
-		console.log("-----");
-		console.log(`Skipped: ${numSkipped}`);
-		console.log(`Exported: ${numExportedTabs}`);
-		console.log("-----");
-		console.log("");
+		console.log(`Exported ${numExportedTabs} remote browser tabs from ${remoteBrowserAppName}`);
 	} catch (err) {
 		console.error(err);
 		new Notice(`Error exporting browser tabs: ${err.message} `);
