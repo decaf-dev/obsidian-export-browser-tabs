@@ -18,6 +18,7 @@ const callback = (app: App, settings: PluginSettings) => async () => {
 		const tabs = await exportLocalTabs(
 			localBrowserAppName
 		);
+
 		const markdownLinks = tabs.map((tab) => `[${tab.title}](${tab.url})`);
 
 		const filePath = `${vaultSavePath}/${fileName} ${Date.now()}.md`;

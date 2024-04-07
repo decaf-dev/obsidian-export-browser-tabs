@@ -1,6 +1,7 @@
 import { exec as execCallback } from "child_process";
 import { promisify } from "util";
 import { BrowserTab } from "./types";
+import { getEmptyTabTitle } from "src/utils/title-utils";
 
 const exec = promisify(execCallback);
 
@@ -40,12 +41,17 @@ export const exportRemoteTabs = async (browserApplicationName: string, adbPath: 
 
 		const arr = JSON.parse(stdout);
 		const tabs: BrowserTab[] = arr.map((entry: unknown) => {
-			const { url, title } = entry as {
+			const { url, title: originalTitle } = entry as {
 				title: string, url: string
 			}
+
+			let title = originalTitle;
+			//It's possible that the title is empty if the tab has not loaded yet
+			if (title.trim() === "")
+				title = getEmptyTabTitle();
 			return {
-				url,
-				title
+				title,
+				url
 			}
 		});
 		return tabs;

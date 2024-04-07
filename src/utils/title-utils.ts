@@ -31,3 +31,7 @@ export const trimForFileSystem = (value: string, extension: string) => {
 export const removeNotificationCount = (value: string) => {
 	return value.replace(/^\(\d\)/, "").trim();
 }
+
+export const getEmptyTabTitle = () => {
+	return `Untitled tab ${crypto.randomUUID()}`;
+}
