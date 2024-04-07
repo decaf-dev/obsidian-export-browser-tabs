@@ -12,14 +12,24 @@ export const exportIntoSingleNoteCommand = (app: App, settings: PluginSettings):
 };
 
 const callback = (app: App, settings: PluginSettings) => async () => {
-	const { vaultSavePath, localBrowserAppName, fileName, exportTitleAndUrl } = settings;
+	const { vaultSavePath, localBrowserAppName, fileName, exportTitleAndUrl, excludedLinks } = settings;
 	try {
 		await createFolder(app, vaultSavePath);
 		const tabs = await exportLocalTabs(
 			localBrowserAppName
 		);
 
-		const markdownLinks = tabs.map((tab) => {
+		const filteredTabs = tabs.filter((tab) => {
+			const { url } = tab;
+			if (excludedLinks.find(link =>
+				url.includes(link)
+			)) {
+				return false;
+			}
+			return true;
+		});
+
+		const markdownLinks = filteredTabs.map((tab) => {
 			const { title, url } = tab;
 			if (exportTitleAndUrl) {
 				return `[${title}](${url})`;
