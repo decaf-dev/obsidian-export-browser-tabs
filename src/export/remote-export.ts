@@ -2,6 +2,7 @@ import { exec as execCallback } from "child_process";
 import { promisify } from "util";
 import { BrowserTab } from "./types";
 import { getEmptyTabTitle } from "src/utils/title-utils";
+import { filterDuplicateTabs } from "./utils";
 
 const exec = promisify(execCallback);
 
@@ -54,7 +55,8 @@ export const exportRemoteTabs = async (browserApplicationName: string, adbPath: 
 				url
 			}
 		});
-		return tabs;
+		const filteredTabs = filterDuplicateTabs(tabs);
+		return filteredTabs;
 	} catch (err: unknown) {
 		const error = err as Error;
 		if (error.message.includes("no devices/emulators found")) {
