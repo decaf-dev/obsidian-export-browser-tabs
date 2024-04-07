@@ -1,11 +1,10 @@
 import { App, Command, Notice } from "obsidian";
 import { createFile, createFolder } from "src/utils/file-utils";
 import { generateFrontmatter } from "src/utils/frontmatter-utils";
-import { appendWebsiteTitle, getWebsiteTitle, removeNotificationCount, removeTrailingHyphen, removeTrailingPeriod, removeWebsiteTitles, trimForObsidian } from "src/utils/title-utils";
+import { removeNotificationCount, trimForFileSystem } from "src/utils/title-utils";
 import { PluginSettings } from "src/types";
 import { pipeline } from "src/utils/pipeline";
 import { formatForFileSystem } from "src/utils/file-system-utils";
-import { toSentenceCase } from "src/utils/string-utils";
 import { doesUrlExist } from "src/utils/vault";
 import { exportLocalTabs } from "src/export/local-export";
 
@@ -34,7 +33,6 @@ const callback = (app: App, settings: PluginSettings) => async () => {
 		for (const tab of tabs) {
 			const { title, url } = tab;
 
-
 			if (excludedLinks.find(link => {
 				return url.includes(link)
 			})) {
@@ -47,17 +45,12 @@ const callback = (app: App, settings: PluginSettings) => async () => {
 				continue;
 			}
 
-			const titlePipeline = pipeline(formatForFileSystem, removeWebsiteTitles, removeTrailingHyphen, removeTrailingPeriod, removeNotificationCount);
-			const titleString = (titlePipeline(title) as string).trim();
+			//Hnadle empty title
+			const titlePipeline = pipeline(formatForFileSystem, removeNotificationCount);
+			const formattedTitle = titlePipeline(title) as string;
+			const trimmedTitle = trimForFileSystem(formattedTitle, ".md");
 
-			const websiteTitle = getWebsiteTitle(url);
-			const trimmed = trimForObsidian(titleString as string, websiteTitle, "md");
-
-			const sentenceCase = toSentenceCase(trimmed);
-			const titleWithWebsite = appendWebsiteTitle(sentenceCase, websiteTitle);
-
-			const fileName = `${titleWithWebsite}.md`;
-
+			const fileName = `${trimmedTitle}.md`;
 			const filePath = `${vaultSavePath}/${fileName}`;
 			const data = generateFrontmatter(urlFrontmatterKey, url);
 

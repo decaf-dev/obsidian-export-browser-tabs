@@ -1,11 +1,11 @@
 import { App, Command, Notice } from "obsidian";
 import { createFileByParts, createFolder } from "src/utils/file-utils";
 import { generateFrontmatter } from "src/utils/frontmatter-utils";
-import { appendWebsiteTitle, getWebsiteTitle, removeNotificationCount, removeTrailingHyphen, removeTrailingPeriod, removeWebsiteTitles, trimForObsidian } from "src/utils/title-utils";
+import { removeNotificationCount, trimForFileSystem } from "src/utils/title-utils";
 import { PluginSettings } from "src/types";
 import { pipeline } from "src/utils/pipeline";
 import { formatForFileSystem } from "src/utils/file-system-utils";
-import { decodeHtmlEntities, toSentenceCase } from "src/utils/string-utils";
+import { decodeHtmlEntities } from "src/utils/string-utils";
 import { doesUrlExist } from "src/utils/vault";
 import { exportRemoteTabs } from "src/export/remote-export";
 
@@ -59,21 +59,15 @@ const callback = (app: App, settings: PluginSettings) => async () => {
 				continue;
 			}
 
-			const titlePipeline = pipeline(decodeHtmlEntities, formatForFileSystem, removeWebsiteTitles, removeTrailingHyphen, removeTrailingPeriod, removeNotificationCount);
-			const titleString = (titlePipeline(title) as string).trim();
-
-			const websiteTitle = getWebsiteTitle(url);
-			const trimmed = trimForObsidian(titleString as string, websiteTitle, "md");
-
-			const sentenceCase = toSentenceCase(trimmed);
-			const titleWithWebsite = appendWebsiteTitle(sentenceCase, websiteTitle);
-
+			const titlePipeline = pipeline(decodeHtmlEntities, formatForFileSystem, removeNotificationCount);
+			const formattedTitle = titlePipeline(title) as string;
+			const trimmedTitle = trimForFileSystem(formattedTitle, ".md");
 			const data = generateFrontmatter(urlFrontmatterKey, url);
 
 			const result = await createFileByParts(
 				app,
 				vaultSavePath,
-				titleWithWebsite,
+				trimmedTitle,
 				"md",
 				data
 			);
