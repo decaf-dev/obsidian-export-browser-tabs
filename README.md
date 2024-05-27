@@ -10,7 +10,7 @@ This is an Obsidian.md plugin that allows MacOS users to export their open brows
 2. Enable the plugin
 3. Open the plugin settings
 4. Click **Add beta plugin**
-5. Enter the repository url: **https://github.com/trey-wallis/obsidian-export-browser-tabs**
+5. Enter the repository url: **https://github.com/decaf-dev/obsidian-export-browser-tabs**
 6. Click **Add plugin**
 7. Navigate to the community plugins list
 8. Enable **Export Browser Tabs**
@@ -45,4 +45,4 @@ This plugin executes AppleScript. It will only work on a MacOS system.
 
 ## License
 
-This plugin is distributed under the [MIT License](https://github.com/trey-wallis/obsidian-export-browser-tabs/blob/master/LICENSE)
+This plugin is distributed under the [MIT License](https://github.com/decaf-dev/obsidian-export-browser-tabs/blob/master/LICENSE)

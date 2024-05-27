@@ -4,8 +4,8 @@
 	"version": "0.7.0",
 	"minAppVersion": "1.4.0",
 	"description": "Export your open browser tabs using AppleScript",
-	"author": "Trey Wallis",
-	"authorUrl": "https://github.com/trey-wallis",
-	"fundingUrl": "https://buymeacoffee.com/treywallis",
+	"author": "DecafDev",
+	"authorUrl": "https://github.com/decaf-dev",
+	"fundingUrl": "https://buymeacoffee.com/decaf_dev",
 	"isDesktopOnly": true
 }
