@@ -104,9 +104,9 @@ export default class SettingsTab extends PluginSettingTab {
 		new Setting(containerEl).setHeading().setName("Export into multiple notes");
 
 		new Setting(containerEl)
-			.setName("URL frontmatter key")
+			.setName("URL property")
 			.setDesc(
-				"The frontmatter key that the URL will be saved under."
+				"The property key that the URL will be saved under."
 			)
 			.addText((text) =>
 				text
