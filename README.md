@@ -25,9 +25,31 @@ Export Browser Tabs is an [Obsidian.md](https://obsidian.md) plugin for desktop 
 
 ## Usage
 
+### Export into single note
+
+This command will export all links into one file
+
 1. Open the Obsidian command palette
-2. Type `Export tabs`
-3. Select `Export tabs into single note` or `Export tabs into multiple notes`
+2. Type **Export tabs**
+3. Click **Export tabs into single note**
+4. Press enter
+
+### Export into multiple notes
+
+This command will export each link into its own file
+
+1. Open the Obsidian command palette
+2. Type **Export tabs**
+3. Click **Export tabs into multiple notes**
+4. Press enter
+
+### Export into multiple notes (remote)
+
+This command will pull from your Android device and export each link into its own file
+
+1. Open the Obsidian command palette
+2. Type **Export tabs**
+3. Click **Export tabs into multiple notes (Remote)**
 4. Press enter
 
 ## Settings
