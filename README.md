@@ -1,6 +1,6 @@
 # Export Browser Tabs
 
-Export Browser Tabs is an Obsidian.md plugin for desktop only. It allows MacOS users to export their open browser tabs into an Obsidian note or a group of notes.
+Export Browser Tabs is an [Obsidian.md](https://obsidian.md) plugin for desktop only. It allows MacOS users to export their open browser tabs into an Obsidian note or a group of notes.
 
 > [!NOTE]
 > This plugin executes AppleScript. It will only work on a MacOS system.
@@ -9,6 +9,7 @@ Export Browser Tabs is an Obsidian.md plugin for desktop only. It allows MacOS u
 
 -   [Installation](#installation)
 -   [Usage](#usage)
+-   [Settings](#settings)
 -   [License](#license)
 
 ## Installation
@@ -24,37 +25,50 @@ Export Browser Tabs is an Obsidian.md plugin for desktop only. It allows MacOS u
 
 ## Usage
 
-1. Open the Obsidian command prompt (cmd + shift + p)
+1. Open the Obsidian command palette
 2. Type `Export tabs`
 3. Select `Export tabs into single note` or `Export tabs into multiple notes`
 4. Press enter
 
 ## Settings
 
-### Browser application name
+### Local browser name
 
-The browser that you wish to pull tabs from
+The name of your local browser. e.g. **brave**
 
-### Folder save path
+### Remote browser name
 
-The relative path of the folder to save to in Obsidian.md
+The name of your remote browser. e.g. **brave**
 
-### File name format
+### ADB
 
-The title format of the note that will be created
+The absolute path of your Android Development Bridge application. This is used if you want to export notes from an Android device.
 
-## Development
+### Folder path
 
-1. Clone the github repository
-2. Install [Bun.sh](https://bun.sh)
-3. Build the project `bun run build`
-4. Add a symbolic link from the `dist` folder to your vault's plugin folder
+The path in Obsidian that you want the exported files to save to
 
-```shell
-ln -s /obsidian-export-browser-tabs/dist /.obsidian/plugins/export-browser-tabs
+### File name
+
+The file name that the file should be exported to. A timestamp will be added to the end. e.g. `browser-tabs-1719556748`
+
+### Export title and url
+
+If true both the title and url will be exported. Otherwise, only the url will be exported.
+
+```markdown
+# Enabled
+
+[Google](https://google.com)
+
+# Disabled
+
+https://google.com
 ```
 
-5. Enable the plugin
+### URL Property
+
+If you wish to save your exported files in a property, you may enter a value.
 
 ## License
 
