@@ -1,9 +1,9 @@
 # Export Browser Tabs
 
-Export Browser Tabs is an [Obsidian.md](https://obsidian.md) plugin for desktop only. It allows MacOS users to export their open browser tabs into an Obsidian note or a group of notes.
+Export Browser Tabs is an [Obsidian.md](https://obsidian.md) plugin for desktop only. It allows MacOS users to export their open browser tabs into a single note or multiple notes.
 
 > [!NOTE]
-> This plugin executes AppleScript. It will only work on a MacOS system.
+> This plugin executes AppleScript. It will only work on a device running MacOS.
 
 ## Table of contents
 
