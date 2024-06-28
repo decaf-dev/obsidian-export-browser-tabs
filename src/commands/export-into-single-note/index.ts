@@ -37,7 +37,7 @@ const callback = (app: App, settings: PluginSettings) => async () => {
 			return url;
 		});
 
-		const filePath = `${vaultSavePath}/${fileName} ${Date.now()}.md`;
+		const filePath = `${vaultSavePath}/${fileName}-${Date.now()}.md`;
 		await createFile(
 			app,
 			filePath,

@@ -14,7 +14,7 @@ const DEFAULT_SETTINGS: PluginSettings = {
 	vaultSavePath: "",
 	localBrowserAppName: "",
 	remoteBrowserAppName: "",
-	fileName: "Browser tabs",
+	fileName: "browser-tabs",
 	urlFrontmatterKey: "url",
 	exportTitleAndUrl: true,
 	excludedLinks: [],
