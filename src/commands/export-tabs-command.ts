@@ -5,6 +5,7 @@ import { formatForFileSystem } from "src/utils/file-system-utils";
 import { createFile, createFolder } from "src/utils/file-utils";
 import { generateFrontmatter } from "src/utils/frontmatter-utils";
 import { pipeline } from "src/utils/pipeline";
+import { removeQueryParams } from "src/utils/string-utils";
 import {
 	removeNotificationCount,
 	trimForFileSystem,
@@ -49,7 +50,8 @@ const callback = (app: App, settings: PluginSettings) => async () => {
 			//Hnadle empty title
 			const titlePipeline = pipeline(
 				formatForFileSystem,
-				removeNotificationCount
+				removeNotificationCount,
+				removeQueryParams
 			);
 			const formattedTitle = titlePipeline(title) as string;
 			const trimmedTitle = trimForFileSystem(formattedTitle, ".md");
