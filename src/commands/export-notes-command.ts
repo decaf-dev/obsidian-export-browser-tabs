@@ -1,31 +1,37 @@
 import { App, Command, Notice } from "obsidian";
+import { exportLocalTabs } from "src/export/local-export";
+import { PluginSettings } from "src/types";
+import { formatForFileSystem } from "src/utils/file-system-utils";
 import { createFile, createFolder } from "src/utils/file-utils";
 import { generateFrontmatter } from "src/utils/frontmatter-utils";
-import { removeNotificationCount, trimForFileSystem } from "src/utils/title-utils";
-import { PluginSettings } from "src/types";
 import { pipeline } from "src/utils/pipeline";
-import { formatForFileSystem } from "src/utils/file-system-utils";
+import {
+	removeNotificationCount,
+	trimForFileSystem,
+} from "src/utils/title-utils";
 import { doesUrlExist } from "src/utils/vault";
-import { exportLocalTabs } from "src/export/local-export";
 
-export const exportIntoMultipleNotesCommand = (
+export const exportBrowserTabsCommand = (
 	app: App,
 	settings: PluginSettings
 ): Command => {
 	return {
-		id: "export-into-multiple-notes",
-		name: "Export into multiple notes",
+		id: "export-browser-tabs",
+		name: "Export browser tabs",
 		callback: callback(app, settings),
 	};
 };
 
 const callback = (app: App, settings: PluginSettings) => async () => {
-	const { vaultSavePath, localBrowserAppName, urlFrontmatterKey, excludedLinks } = settings;
+	const {
+		saveFolder,
+		localBrowserAppName,
+		urlProperty: urlFrontmatterKey,
+		excludedLinks,
+	} = settings;
 	try {
-		await createFolder(app, vaultSavePath);
-		const tabs = await exportLocalTabs(
-			localBrowserAppName
-		);
+		await createFolder(app, saveFolder);
+		const tabs = await exportLocalTabs(localBrowserAppName);
 		console.log(`Found ${tabs.length} browser tabs`);
 
 		let numExportedTabs = 0;
@@ -33,9 +39,7 @@ const callback = (app: App, settings: PluginSettings) => async () => {
 		for (const tab of tabs) {
 			const { title, url } = tab;
 
-			if (excludedLinks.find(link =>
-				url.includes(link)
-			)) {
+			if (excludedLinks.find((link) => url.includes(link))) {
 				console.log(`URL is excluded: ${url}`);
 				continue;
 			}
@@ -46,19 +50,18 @@ const callback = (app: App, settings: PluginSettings) => async () => {
 			}
 
 			//Hnadle empty title
-			const titlePipeline = pipeline(formatForFileSystem, removeNotificationCount);
+			const titlePipeline = pipeline(
+				formatForFileSystem,
+				removeNotificationCount
+			);
 			const formattedTitle = titlePipeline(title) as string;
 			const trimmedTitle = trimForFileSystem(formattedTitle, ".md");
 
 			const fileName = `${trimmedTitle}.md`;
-			const filePath = `${vaultSavePath}/${fileName}`;
+			const filePath = `${saveFolder}/${fileName}`;
 			const data = generateFrontmatter(urlFrontmatterKey, url);
 
-			await createFile(
-				app,
-				filePath,
-				data
-			);
+			await createFile(app, filePath, data);
 			numExportedTabs++;
 		}
 		new Notice(

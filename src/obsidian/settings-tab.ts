@@ -1,4 +1,4 @@
-import { PluginSettingTab, App, Setting } from "obsidian";
+import { App, PluginSettingTab, Setting } from "obsidian";
 import ExportBrowserTabs from "../main";
 
 export default class SettingsTab extends PluginSettingTab {
@@ -16,9 +16,6 @@ export default class SettingsTab extends PluginSettingTab {
 
 		this.renderGeneralSettings(containerEl);
 		this.renderRemoteSettings(containerEl);
-		this.addSingleNoteSettings(containerEl);
-		this.renderMultipleNoteSettings(containerEl);
-
 	}
 
 	renderGeneralSettings(containerEl: HTMLElement): void {
@@ -39,80 +36,25 @@ export default class SettingsTab extends PluginSettingTab {
 			);
 
 		new Setting(containerEl)
-			.setName("Remote browser application name")
-			.setDesc(
-				"The name of the remote browser application to export tabs from. e.g. brave or chrome"
-			)
+			.setName("Save folder")
+			.setDesc("The folder to save the exported tabs to.")
 			.addText((text) =>
 				text
-					.setValue(this.plugin.settings.remoteBrowserAppName)
+					.setValue(this.plugin.settings.saveFolder)
 					.onChange(async (value) => {
-						this.plugin.settings.remoteBrowserAppName = value;
+						this.plugin.settings.saveFolder = value;
 						await this.plugin.saveSettings();
 					})
 			);
-	}
-
-	addSingleNoteSettings(containerEl: HTMLElement): void {
-		new Setting(containerEl).setHeading().setName("Export into single note");
-
-
-		new Setting(containerEl)
-			.setName("Folder save path")
-			.setDesc(
-				"The internal Obsidian path to save the exported tabs file to."
-			)
-			.addText((text) =>
-				text
-					.setValue(this.plugin.settings.vaultSavePath)
-					.onChange(async (value) => {
-						this.plugin.settings.vaultSavePath = value;
-						await this.plugin.saveSettings();
-					})
-			);
-
-		new Setting(containerEl)
-			.setName("File name")
-			.setDesc(
-				"The file name to use when saving the exported tabs. A timestamp will be appended to the end."
-			)
-			.addText((text) =>
-				text
-					.setValue(this.plugin.settings.fileName)
-					.onChange(async (value) => {
-						this.plugin.settings.fileName = value;
-						await this.plugin.saveSettings();
-					})
-			);
-
-		new Setting(containerEl)
-			.setName("Export title and url")
-			.setDesc(
-				"If true, both the title and URL of the tab will be exported. If false, only the URL will be exported."
-			)
-			.addToggle((text) =>
-				text
-					.setValue(this.plugin.settings.exportTitleAndUrl)
-					.onChange(async (value) => {
-						this.plugin.settings.exportTitleAndUrl = value;
-						await this.plugin.saveSettings();
-					})
-			);
-	}
-
-	renderMultipleNoteSettings(containerEl: HTMLElement): void {
-		new Setting(containerEl).setHeading().setName("Export into multiple notes");
 
 		new Setting(containerEl)
 			.setName("URL property")
-			.setDesc(
-				"The property key that the URL will be saved under."
-			)
+			.setDesc("The property that the URL will be saved in.")
 			.addText((text) =>
 				text
-					.setValue(this.plugin.settings.urlFrontmatterKey)
+					.setValue(this.plugin.settings.urlProperty)
 					.onChange(async (value) => {
-						this.plugin.settings.urlFrontmatterKey = value;
+						this.plugin.settings.urlProperty = value;
 						await this.plugin.saveSettings();
 					})
 			);
@@ -131,6 +73,20 @@ export default class SettingsTab extends PluginSettingTab {
 					.setValue(this.plugin.settings.adbPath)
 					.onChange(async (value) => {
 						this.plugin.settings.adbPath = value;
+						await this.plugin.saveSettings();
+					})
+			);
+
+		new Setting(containerEl)
+			.setName("Remote browser application name")
+			.setDesc(
+				"The name of the remote browser application to export tabs from. e.g. brave or chrome"
+			)
+			.addText((text) =>
+				text
+					.setValue(this.plugin.settings.remoteBrowserAppName)
+					.onChange(async (value) => {
+						this.plugin.settings.remoteBrowserAppName = value;
 						await this.plugin.saveSettings();
 					})
 			);

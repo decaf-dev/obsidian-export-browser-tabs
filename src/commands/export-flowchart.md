@@ -1,6 +1,6 @@
 ```mermaid
 ---
-title: Export into multiple notes
+title: Export notes command
 ---
 flowchart TD
     Start --> A

@@ -10,11 +10,11 @@ export const showExcludedLinksCommand = (app: App): Command => {
 			if (leaf) {
 				app.workspace.revealLeaf(leaf);
 			} else {
-				app.workspace.getRightLeaf(false).setViewState({
+				app.workspace.getRightLeaf(false)?.setViewState({
 					type: EXCLUDED_LINKS_VIEW,
 					active: true,
-				})
+				});
 			}
 		},
-	}
-}
+	};
+};
