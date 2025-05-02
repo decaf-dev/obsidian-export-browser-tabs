@@ -1,23 +1,24 @@
 import { App, Command, Notice } from "obsidian";
-import { exportLocalTabs } from "src/export/local-export";
+import { exportRemoteTabs } from "src/export/remote-export";
 import { PluginSettings } from "src/types";
 import { formatForFileSystem } from "src/utils/file-system-utils";
-import { createFile, createFolder } from "src/utils/file-utils";
+import { createFileByParts, createFolder } from "src/utils/file-utils";
 import { generateFrontmatter } from "src/utils/frontmatter-utils";
 import { pipeline } from "src/utils/pipeline";
+import { decodeHtmlEntities } from "src/utils/string-utils";
 import {
 	removeNotificationCount,
 	trimForFileSystem,
 } from "src/utils/title-utils";
 import { doesUrlExist } from "src/utils/vault";
 
-export const exportBrowserTabsCommand = (
+export const exportTabsRemoteCommand = (
 	app: App,
 	settings: PluginSettings
 ): Command => {
 	return {
-		id: "export-browser-tabs",
-		name: "Export browser tabs",
+		id: "export-browser-tabs-remote",
+		name: "Export browser tabs (remote)",
 		callback: callback(app, settings),
 	};
 };
@@ -25,14 +26,15 @@ export const exportBrowserTabsCommand = (
 const callback = (app: App, settings: PluginSettings) => async () => {
 	const {
 		saveFolder,
-		localBrowserAppName,
+		remoteBrowserAppName,
 		urlProperty: urlFrontmatterKey,
 		excludedLinks,
+		adbPath,
 	} = settings;
 	try {
 		await createFolder(app, saveFolder);
-		const tabs = await exportLocalTabs(localBrowserAppName);
-		console.log(`Found ${tabs.length} browser tabs`);
+		const tabs = await exportRemoteTabs(remoteBrowserAppName, adbPath);
+		console.log(`Found ${tabs.length} remote browser tabs`);
 
 		let numExportedTabs = 0;
 
@@ -49,23 +51,23 @@ const callback = (app: App, settings: PluginSettings) => async () => {
 				continue;
 			}
 
-			//Hnadle empty title
 			const titlePipeline = pipeline(
+				decodeHtmlEntities,
 				formatForFileSystem,
 				removeNotificationCount
 			);
 			const formattedTitle = titlePipeline(title) as string;
 			const trimmedTitle = trimForFileSystem(formattedTitle, ".md");
-
-			const fileName = `${trimmedTitle}.md`;
-			const filePath = `${saveFolder}/${fileName}`;
 			const data = generateFrontmatter(urlFrontmatterKey, url);
 
-			await createFile(app, filePath, data);
+			await createFileByParts(app, saveFolder, trimmedTitle, "md", data);
 			numExportedTabs++;
 		}
 		new Notice(
-			`Exported ${numExportedTabs} browser tabs from ${localBrowserAppName}`
+			`Exported ${numExportedTabs} remote browser tabs from ${remoteBrowserAppName}`
+		);
+		console.log(
+			`Exported ${numExportedTabs} remote browser tabs from ${remoteBrowserAppName}`
 		);
 	} catch (err) {
 		console.error(err);

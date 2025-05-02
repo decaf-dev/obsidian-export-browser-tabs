@@ -1,6 +1,6 @@
 ```mermaid
 ---
-title: Export notes command
+title: Export browser tabs command
 ---
 flowchart TD
     Start --> A
@@ -15,5 +15,4 @@ flowchart TD
 	H --> I[Create file with frontmatter data]
 
 	end
-	N --> O[Push success notification]
 ```
