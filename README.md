@@ -25,16 +25,7 @@ Export Browser Tabs is an [Obsidian.md](https://obsidian.md) plugin for desktop 
 
 ## Usage
 
-### Export into single note
-
-This command will export all links into one file
-
-1. Open the Obsidian command palette
-2. Type **Export tabs**
-3. Click **Export tabs into single note**
-4. Press enter
-
-### Export into multiple notes
+### Export browser tabs
 
 This command will export each link into its own file
 
@@ -43,7 +34,7 @@ This command will export each link into its own file
 3. Click **Export tabs into multiple notes**
 4. Press enter
 
-### Export into multiple notes (remote)
+### Export browser tabs (remote)
 
 This command will pull from your Android device and export each link into its own file
 
@@ -54,9 +45,21 @@ This command will pull from your Android device and export each link into its ow
 
 ## Settings
 
-### Local browser name
+### General
+
+#### Local browser name
 
 The name of your local browser. e.g. **brave**
+
+### Folder path
+
+The path in Obsidian that you want the exported files to save to
+
+### URL Property
+
+If you wish to save your exported files in a property, you may enter a value.
+
+### Remote
 
 ### Remote browser name
 
@@ -65,32 +68,6 @@ The name of your remote browser. e.g. **brave**
 ### ADB
 
 The absolute path of your Android Development Bridge application. This is used if you want to export notes from an Android device.
-
-### Folder path
-
-The path in Obsidian that you want the exported files to save to
-
-### File name
-
-The file name that the file should be exported to. A timestamp will be added to the end. e.g. `browser-tabs-1719556748`
-
-### Export title and url
-
-If true both the title and url will be exported. Otherwise, only the url will be exported.
-
-```markdown
-# Enabled
-
-[Google](https://google.com)
-
-# Disabled
-
-https://google.com
-```
-
-### URL Property
-
-If you wish to save your exported files in a property, you may enter a value.
 
 ## License
 
