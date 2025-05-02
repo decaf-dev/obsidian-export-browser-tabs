@@ -1,8 +1,8 @@
 import { Plugin } from "obsidian";
 import { excludeDomainCommand } from "./commands/exclude-domain";
 import { excludeUrlCommand } from "./commands/exclude-url";
-import { exportTabsCommand } from "./commands/export-tabs-command";
-import { exportTabsRemoteCommand } from "./commands/export-tabs-remote-command";
+import { exportCommand } from "./commands/export-command";
+import { exportRemoteCommand } from "./commands/export-remote-command";
 import { showExcludedLinksCommand } from "./commands/show-excluded-tabs";
 import { EXCLUDED_LINKS_VIEW } from "./constants";
 import ExcludedTabsView from "./obsidian/excluded-links-view";
@@ -33,8 +33,8 @@ export default class ExportBrowserTabsPlugin extends Plugin {
 		);
 
 		// Register commands
-		this.addCommand(exportTabsCommand(this.app, this.settings));
-		this.addCommand(exportTabsRemoteCommand(this.app, this.settings));
+		this.addCommand(exportCommand(this.app, this.settings));
+		this.addCommand(exportRemoteCommand(this.app, this.settings));
 		this.addCommand(showExcludedLinksCommand(this.app));
 		this.addCommand(excludeUrlCommand(this.app, this));
 		this.addCommand(excludeDomainCommand(this.app, this));
