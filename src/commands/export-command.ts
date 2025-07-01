@@ -30,38 +30,46 @@ const callback = (app: App, settings: PluginSettings) => async () => {
 		console.log(`Found ${tabs.length} browser tabs`);
 
 		let numExportedTabs = 0;
+		let numFailedTabs = 0;
 
 		for (const tab of tabs) {
 			const { title, url } = tab;
 
-			if (excludedLinks.find((link) => url.includes(link))) {
-				console.log(`URL is excluded: ${url}`);
-				continue;
+			try {
+				if (excludedLinks.find((link) => url.includes(link))) {
+					console.log(`URL is excluded: ${url}`);
+					continue;
+				}
+
+				if (doesUrlExist(app, url)) {
+					console.log(`URL already exists in vault: ${url}`);
+					continue;
+				}
+
+				//Hnadle empty title
+				const titlePipeline = pipeline(
+					formatForFileSystem,
+					removeNotificationCount,
+					removeQueryParams
+				);
+				const formattedTitle = titlePipeline(title) as string;
+				const trimmedTitle = trimForFileSystem(formattedTitle, ".md");
+
+				const fileName = `${trimmedTitle}.md`;
+				const filePath = `${saveFolder}/${fileName}`;
+				const data = generateFrontmatter(urlProperty, url);
+
+				await createFile(app, filePath, data);
+				numExportedTabs++;
+			} catch (err) {
+				console.error(err);
+				numFailedTabs++;
 			}
-
-			if (doesUrlExist(app, url)) {
-				console.log(`URL already exists in vault: ${url}`);
-				continue;
-			}
-
-			//Hnadle empty title
-			const titlePipeline = pipeline(
-				formatForFileSystem,
-				removeNotificationCount,
-				removeQueryParams
-			);
-			const formattedTitle = titlePipeline(title) as string;
-			const trimmedTitle = trimForFileSystem(formattedTitle, ".md");
-
-			const fileName = `${trimmedTitle}.md`;
-			const filePath = `${saveFolder}/${fileName}`;
-			const data = generateFrontmatter(urlProperty, url);
-
-			await createFile(app, filePath, data);
-			numExportedTabs++;
 		}
 		new Notice(
-			`Exported ${numExportedTabs} browser tabs from ${localBrowserAppName}`
+			`Export complete: ${numExportedTabs} tabs exported from ${localBrowserAppName}${
+				numFailedTabs > 0 ? `, ${numFailedTabs} failed` : ""
+			}`
 		);
 	} catch (err) {
 		console.error(err);
