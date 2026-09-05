@@ -1,4 +1,8 @@
-import { App, Notice, normalizePath } from "obsidian";
+import { App, normalizePath } from "obsidian";
+import { withDuplicateSuffix } from "src/utils/title-utils";
+
+/** Guards against an unbounded loop if `create` keeps reporting a collision */
+const MAX_DUPLICATE_ATTEMPTS = 100;
 
 /**
  * Creates a folder if it doesn't already exist
@@ -18,58 +22,36 @@ export const createFolder = async (app: App, folderPath: string) => {
 }
 
 /**
- * Creates a file. The path will be normalized.
+ * Creates a file, falling back to "<name> (Duplicate)", "<name> (Duplicate 2)", ...
+ * when the name is already taken. The path will be normalized.
+ * @throws If the file cannot be created for any reason other than a name collision
  * @param app - The Obsidian app object
- * @param filePath - The path to the file to create
+ * @param savePath - The folder to create the file in
+ * @param fileName - The desired file name, without an extension
+ * @param extension - The file extension, without a leading dot
  * @param data - The data to write to the file
+ * @returns The file name that was actually used, so the caller can report renames
  */
-export const createFile = async (
-	app: App,
-	filePath: string,
-	data: string
-) => {
-	try {
-		const normalizedFilePath = normalizePath(filePath);
-		await app.vault.create(normalizedFilePath, data);
-	} catch (err) {
-		if (err.message.includes("already exists")) {
-			throw new Error(`File already exists in vault: ${filePath}`);
-		}
-		throw err;
-	}
-}
-
-/**
- * Creates a file. The path will be normalized.
- * @param app - The Obsidian app object
- * @param filePath - The path to the file to create
- * @param data - The data to write to the file
- */
-export const createFileByParts = async (
+export const createFileWithUniqueName = async (
 	app: App,
 	savePath: string,
 	fileName: string,
 	extension: string,
 	data: string
-) => {
-	const filePath = `${savePath}/${fileName}.${extension}`;
-	try {
-		const normalizedFilePath = normalizePath(filePath);
-		await app.vault.create(normalizedFilePath, data);
-		return true;
-	} catch (err) {
-		if (err.message.includes("already exists")) {
-			// console.log("File already exists in vault:", filePath);
-			const newFilePath = `${savePath}/Tab conflict ${crypto.randomUUID()}.${extension}`;
-			try {
-				await createFile(app, newFilePath, data);
-			} catch (err) {
-				console.error(err);
-				new Notice(`Error creating file: ${err.message}`);
+): Promise<string> => {
+	for (let attempt = 0; attempt <= MAX_DUPLICATE_ATTEMPTS; attempt++) {
+		const name = withDuplicateSuffix(fileName, attempt, extension);
+		try {
+			const filePath = normalizePath(`${savePath}/${name}.${extension}`);
+			await app.vault.create(filePath, data);
+			return name;
+		} catch (err) {
+			if (!err.message.includes("already exists")) {
+				throw err;
 			}
-			return false;
 		}
-		throw err;
 	}
+	throw new Error(
+		`Could not find an available name for: ${fileName}.${extension}`
+	);
 }
-

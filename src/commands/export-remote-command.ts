@@ -3,7 +3,7 @@ import { RemoteExportError, getErrorMessage } from "src/export/errors";
 import { exportRemoteTabs } from "src/export/remote-export";
 import { PluginSettings } from "src/types";
 import { formatForFileSystem } from "src/utils/file-system-utils";
-import { createFileByParts, createFolder } from "src/utils/file-utils";
+import { createFileWithUniqueName, createFolder } from "src/utils/file-utils";
 import { generateFrontmatter } from "src/utils/frontmatter-utils";
 import { pipeline } from "src/utils/pipeline";
 import { decodeHtmlEntities } from "src/utils/string-utils";
@@ -112,16 +112,16 @@ const callback = (app: App, settings: PluginSettings) => async () => {
 				const trimmedTitle = trimForFileSystem(formattedTitle, ".md");
 				const data = generateFrontmatter(urlFrontmatterKey, url);
 
-				const didUseGivenName = await createFileByParts(
+				const createdName = await createFileWithUniqueName(
 					app,
 					saveFolder,
 					trimmedTitle,
 					"md",
 					data
 				);
-				//A name collision falls back to a "Tab conflict" file, which the user
-				//would otherwise have no way of knowing about
-				if (!didUseGivenName) {
+				//A name collision appends "(Duplicate)", which the user would
+				//otherwise have no way of knowing about
+				if (createdName !== trimmedTitle) {
 					numRenamedTabs++;
 				}
 
