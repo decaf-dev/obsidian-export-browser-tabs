@@ -1,67 +1,54 @@
-import { exec as execCallback } from "child_process";
-import { promisify } from "util";
+import { DEVTOOLS_TIMEOUT_MS } from "src/constants";
+import {
+	closePortForward,
+	findDevToolsSocket,
+	getConnectedDeviceSerial,
+	openPortForward,
+	validateAdbPath,
+} from "./adb";
+import { fetchDevToolsTargets, parseDevToolsTargets } from "./devtools";
+import { RemoteExportError } from "./errors";
 import { BrowserTab } from "./types";
-import { getEmptyTabTitle } from "src/utils/title-utils";
-import { filterDuplicateTabs } from "./utils";
 
-const exec = promisify(execCallback);
-
-export const exportRemoteTabs = async (browserApplicationName: string, adbPath: string): Promise<BrowserTab[]> => {
+/**
+ * Reads the open tabs from a browser running on a connected Android device.
+ *
+ * Each step runs as its own checked subprocess so that a failure can say which stage
+ * broke and what the user should do about it.
+ * @throws RemoteExportError with a message suitable for showing to the user
+ * @param browserApplicationName - The name of the browser running on the device
+ * @param adbPath - The absolute path to the ADB executable
+ */
+export const exportRemoteTabs = async (
+	browserApplicationName: string,
+	adbPath: string
+): Promise<BrowserTab[]> => {
 	if (browserApplicationName === "") {
-		throw new Error(
+		throw new RemoteExportError(
+			"MISSING_APP_NAME",
 			"No remote browser application name specified. Please set one in the plugin settings."
 		);
 	}
 
-	if (adbPath === "") {
-		throw new Error(
-			"No ADB path specified. Please set one in the plugin settings."
-		);
-	}
+	validateAdbPath(adbPath);
 
-	//forwarding will output 9222 so we need to redirect that to /dev/null
-	let command = `
-		if ! command -v "${adbPath}" &> /dev/null
-		then
-			echo "${adbPath} could not be found, please install it and run this script again."
-			exit
-		fi
+	const serial = await getConnectedDeviceSerial(adbPath);
+	const socket = await findDevToolsSocket(
+		adbPath,
+		serial,
+		browserApplicationName
+	);
+	const port = await openPortForward(adbPath, serial, socket);
 
-		${adbPath} forward tcp:9222 localabstract:chrome_devtools_remote >/dev/null
-		curl -s http://localhost:9222/json/list
-		${adbPath} forward --remove tcp:9222
-	`;
-
-
+	//Opened after the forward exists, so cleanup only runs for a forward we created
 	try {
-		const MAX_BUFFER_SIZE = 1024 * 1024 * 10;
-		const { stdout, stderr } = await exec(command, { maxBuffer: MAX_BUFFER_SIZE });
-		if (stderr) {
-			throw new Error(stderr);
-		}
-
-		const arr = JSON.parse(stdout);
-		const tabs: BrowserTab[] = arr.map((entry: unknown) => {
-			const { url, title: originalTitle } = entry as {
-				title: string, url: string
-			}
-
-			let title = originalTitle;
-			//It's possible that the title is empty if the tab has not loaded yet
-			if (title.trim() === "")
-				title = getEmptyTabTitle();
-			return {
-				title,
-				url
-			}
-		});
-		const filteredTabs = filterDuplicateTabs(tabs);
-		return filteredTabs;
-	} catch (err: unknown) {
-		const error = err as Error;
-		if (error.message.includes("no devices/emulators found")) {
-			throw new Error("No devices found. Please connect a device and try again.");
-		}
-		throw err;
+		const payload = await fetchDevToolsTargets(
+			port,
+			DEVTOOLS_TIMEOUT_MS,
+			browserApplicationName
+		);
+		return parseDevToolsTargets(payload);
+	} finally {
+		await closePortForward(adbPath, serial, port);
 	}
-}
+};

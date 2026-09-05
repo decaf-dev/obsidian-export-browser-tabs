@@ -1,4 +1,10 @@
-import { App, PluginSettingTab, Setting } from "obsidian";
+import { App, Notice, PluginSettingTab, Setting } from "obsidian";
+import {
+	findDevToolsSocket,
+	getConnectedDeviceSerial,
+	validateAdbPath,
+} from "src/export/adb";
+import { getErrorMessage } from "src/export/errors";
 import ExportBrowserTabs from "../main";
 
 export default class SettingsTab extends PluginSettingTab {
@@ -66,7 +72,7 @@ export default class SettingsTab extends PluginSettingTab {
 		new Setting(containerEl)
 			.setName("ADB path")
 			.setDesc(
-				"The absolute path to the ADB executable on your machine. This can be found by running 'which adb' in your terminal."
+				"The absolute path to the ADB executable on your machine. Find it by running 'which adb' in your terminal. It must be absolute, because Obsidian does not use your terminal's PATH."
 			)
 			.addText((text) =>
 				text
@@ -80,7 +86,7 @@ export default class SettingsTab extends PluginSettingTab {
 		new Setting(containerEl)
 			.setName("Remote browser application name")
 			.setDesc(
-				"The name of the remote browser application to export tabs from. e.g. brave or chrome"
+				"The name of the remote browser application to export tabs from. e.g. brave or chrome. This is matched against the debugging sockets found on the device."
 			)
 			.addText((text) =>
 				text
@@ -90,5 +96,50 @@ export default class SettingsTab extends PluginSettingTab {
 						await this.plugin.saveSettings();
 					})
 			);
+
+		new Setting(containerEl)
+			.setName("Test connection")
+			.setDesc(
+				"Check that ADB can reach your device and find the browser, without exporting anything."
+			)
+			.addButton((button) =>
+				button.setButtonText("Test").onClick(async () => {
+					button.setDisabled(true);
+					button.setButtonText("Testing...");
+					try {
+						await this.testConnection();
+					} finally {
+						button.setDisabled(false);
+						button.setButtonText("Test");
+					}
+				})
+			);
+	}
+
+	/**
+	 * Runs the connection steps of a remote export and reports where it got to.
+	 * This exists so that a failing export can be diagnosed from the settings, rather
+	 * than only ever being reported as an export that found nothing.
+	 */
+	async testConnection(): Promise<void> {
+		const { adbPath, remoteBrowserAppName } = this.plugin.settings;
+		try {
+			if (remoteBrowserAppName === "") {
+				throw new Error(
+					"No remote browser application name specified. Please set one above."
+				);
+			}
+			validateAdbPath(adbPath);
+			const serial = await getConnectedDeviceSerial(adbPath);
+			const socket = await findDevToolsSocket(
+				adbPath,
+				serial,
+				remoteBrowserAppName
+			);
+			new Notice(`Connected to ${serial}, found ${socket}`, 10_000);
+		} catch (err) {
+			console.error(err);
+			new Notice(getErrorMessage(err), 10_000);
+		}
 	}
 }
