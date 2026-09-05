@@ -14,9 +14,10 @@ flowchart TD
 	E --> F["Remove notification count '(1)'"]
 	F --> G[Trim to 255 characters]
 	G --> H[Get frontmatter for file]
-	H --> I[Create file with frontmatter data]
+	H --> I["Create file with frontmatter data<br/>a name collision becomes '&lt;title&gt; (Duplicate N)'"]
 
 	end
+	one --> Summary["Summary: exported, renamed, failed"]
 ```
 
 ## Export (remote)
@@ -51,7 +52,7 @@ flowchart TD
 	E --> E2[Remove invalid characters for file system]
 	E2 --> G["Remove notification count '(1)'"]
 	G --> G2[Trim to 255 characters]
-	G2 --> I["Create file<br/>a name collision becomes a 'Tab conflict' file"]
+	G2 --> I["Create file<br/>a name collision becomes '&lt;title&gt; (Duplicate N)'"]
 	end
 	one --> Summary["Summary: exported, skipped, renamed, failed"]
 	Summary --> Cleanup["adb forward --remove<br/>always runs"]

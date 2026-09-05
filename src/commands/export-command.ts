@@ -2,7 +2,7 @@ import { App, Command, Notice } from "obsidian";
 import { exportLocalTabs } from "src/export/local-export";
 import { PluginSettings } from "src/types";
 import { formatForFileSystem } from "src/utils/file-system-utils";
-import { createFile, createFolder } from "src/utils/file-utils";
+import { createFileWithUniqueName, createFolder } from "src/utils/file-utils";
 import { generateFrontmatter } from "src/utils/frontmatter-utils";
 import { pipeline } from "src/utils/pipeline";
 import { removeQueryParams } from "src/utils/string-utils";
@@ -30,6 +30,7 @@ const callback = (app: App, settings: PluginSettings) => async () => {
 		console.log(`Found ${tabs.length} browser tabs`);
 
 		let numExportedTabs = 0;
+		let numRenamedTabs = 0;
 		let numFailedTabs = 0;
 
 		for (const tab of tabs) {
@@ -55,20 +56,36 @@ const callback = (app: App, settings: PluginSettings) => async () => {
 				const formattedTitle = titlePipeline(title) as string;
 				const trimmedTitle = trimForFileSystem(formattedTitle, ".md");
 
-				const fileName = `${trimmedTitle}.md`;
-				const filePath = `${saveFolder}/${fileName}`;
 				const data = generateFrontmatter(urlProperty, url);
 
-				await createFile(app, filePath, data);
+				const createdName = await createFileWithUniqueName(
+					app,
+					saveFolder,
+					trimmedTitle,
+					"md",
+					data
+				);
+				//A name collision appends "(Duplicate)", which the user would
+				//otherwise have no way of knowing about
+				if (createdName !== trimmedTitle) {
+					numRenamedTabs++;
+				}
+
 				numExportedTabs++;
 			} catch (err) {
 				console.error(err);
 				numFailedTabs++;
 			}
 		}
+
+		const details = [
+			numRenamedTabs > 0 ? `${numRenamedTabs} renamed` : null,
+			numFailedTabs > 0 ? `${numFailedTabs} failed` : null,
+		].filter((detail) => detail !== null);
+
 		new Notice(
 			`Export complete: ${numExportedTabs} tabs exported from ${localBrowserAppName}${
-				numFailedTabs > 0 ? `, ${numFailedTabs} failed` : ""
+				details.length > 0 ? `, ${details.join(", ")}` : ""
 			}`
 		);
 	} catch (err) {
